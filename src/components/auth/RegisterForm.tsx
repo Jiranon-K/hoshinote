@@ -33,9 +33,7 @@ export default function RegisterForm() {
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       })
 
@@ -48,7 +46,7 @@ export default function RegisterForm() {
         setError(msg)
         push({ title: 'Registration failed', description: msg, type: 'error' })
       }
-  } catch {
+    } catch {
       setError('An error occurred. Please try again.')
       push({ title: 'Error', description: 'An error occurred. Please try again.', type: 'error' })
     } finally {
@@ -57,91 +55,82 @@ export default function RegisterForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-center">Create your account</CardTitle>
-            <CardDescription className="text-center">
-              Join Hoshilog and start sharing your thoughts
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              {error && null}
+    <Card className="border-0 shadow-none">
+      <CardHeader className="p-0 mb-6">
+        <CardTitle className="text-2xl font-semibold tracking-tight text-center">Create your account</CardTitle>
+        <CardDescription className="text-center text-sm">Join Hoshilog and start sharing your thoughts</CardDescription>
+      </CardHeader>
+      <CardContent className="p-0">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {error && (
+            <p className="text-sm text-red-600 text-center">{error}</p>
+          )}
 
-              <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="Enter your full name"
-                  {...register('name')}
-                />
-                {errors.name && (
-                  <p className="text-sm text-red-600">{errors.name.message}</p>
-                )}
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="Jane Doe"
+                autoComplete="name"
+                {...register('name')}
+              />
+              {errors.name && (
+                <p className="text-xs text-red-600">{errors.name.message}</p>
+              )}
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  {...register('email')}
-                />
-                {errors.email && (
-                  <p className="text-sm text-red-600">{errors.email.message}</p>
-                )}
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="m@example.com"
+                autoComplete="email"
+                {...register('email')}
+              />
+              {errors.email && (
+                <p className="text-xs text-red-600">{errors.email.message}</p>
+              )}
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  {...register('password')}
-                />
-                {errors.password && (
-                  <p className="text-sm text-red-600">{errors.password.message}</p>
-                )}
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                autoComplete="new-password"
+                {...register('password')}
+              />
+              {errors.password && (
+                <p className="text-xs text-red-600">{errors.password.message}</p>
+              )}
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="Confirm your password"
-                  {...register('confirmPassword')}
-                />
-                {errors.confirmPassword && (
-                  <p className="text-sm text-red-600">{errors.confirmPassword.message}</p>
-                )}
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                autoComplete="new-password"
+                {...register('confirmPassword')}
+              />
+              {errors.confirmPassword && (
+                <p className="text-xs text-red-600">{errors.confirmPassword.message}</p>
+              )}
+            </div>
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? 'Creating account...' : 'Create account'}
-              </Button>
-
-              <div className="text-center">
-                <p className="text-sm text-gray-600">
-                  Already have an account?{' '}
-                  <Link href="/auth/login" className="text-blue-600 hover:underline">
-                    Sign in
-                  </Link>
-                </p>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? 'Creating account...' : 'Create account'}
+            </Button>
+        </form>
+        <p className="mt-6 text-center text-sm text-muted-foreground">
+          Already have an account?{' '}
+          <Link href="/auth/login" className="underline underline-offset-4 hover:text-primary">Sign in</Link>
+        </p>
+      </CardContent>
+    </Card>
   )
 }

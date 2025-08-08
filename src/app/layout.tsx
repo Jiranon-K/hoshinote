@@ -3,8 +3,7 @@ import { Nunito } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "@/components/providers/SessionProvider";
 import { ToastProvider } from "../components/ui/toaster";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import AppShell from "@/components/layout/AppShell";
 import { siteConfig } from "@/config/site";
 
 const nunito = Nunito({
@@ -68,11 +67,9 @@ export default function RootLayout({
       >
         <AuthProvider>
           <ToastProvider>
-          <Header />
-          <main className="flex-1">
+          <AppShell>
             {children}
-          </main>
-          <Footer />
+          </AppShell>
           </ToastProvider>
         </AuthProvider>
       </body>
