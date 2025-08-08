@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
+import { useToast } from '@/components/ui/toaster'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -15,6 +16,7 @@ import Link from 'next/link'
 export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const { push } = useToast()
   const router = useRouter()
 
   const {
@@ -27,7 +29,7 @@ export default function LoginForm() {
 
   const onSubmit = async (data: LoginInput) => {
     setIsLoading(true)
-    setError('')
+  setError('')
 
     try {
       const result = await signIn('credentials', {
@@ -38,12 +40,17 @@ export default function LoginForm() {
 
       if (result?.error) {
         setError('Invalid email or password')
+        push({ title: 'Login failed', description: 'Invalid email or password', type: 'error' })
       } else {
-        router.push('/dashboard')
-        router.refresh()
+        push({ title: 'Login success', description: 'Redirecting to dashboard...', type: 'success' })
+        setTimeout(() => {
+          router.push('/dashboard')
+          router.refresh()
+        }, 1000)
       }
-    } catch (error) {
-      setError('An error occurred. Please try again.')
+  } catch {
+  setError('An error occurred. Please try again.')
+  push({ title: 'Error', description: 'An error occurred. Please try again.', type: 'error' })
     } finally {
       setIsLoading(false)
     }
@@ -61,11 +68,7 @@ export default function LoginForm() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
-                  {error}
-                </div>
-              )}
+              {error && null}
 
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
@@ -103,7 +106,7 @@ export default function LoginForm() {
 
               <div className="text-center">
                 <p className="text-sm text-gray-600">
-                  Don't have an account?{' '}
+                  Don&apos;t have an account?{' '}
                   <Link href="/auth/register" className="text-blue-600 hover:underline">
                     Sign up
                   </Link>

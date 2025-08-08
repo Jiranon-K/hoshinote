@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
+import { useToast } from '@/components/ui/toaster'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -14,7 +15,7 @@ import Link from 'next/link'
 export default function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
+  const { push } = useToast()
   const router = useRouter()
 
   const {
@@ -39,45 +40,20 @@ export default function RegisterForm() {
       })
 
       if (response.ok) {
-        setSuccess(true)
-        setTimeout(() => {
-          router.push('/auth/login')
-        }, 2000)
+        push({ title: 'Registration successful', description: 'Redirecting to login...', type: 'success' })
+        setTimeout(() => { router.push('/auth/login') }, 1200)
       } else {
         const errorData = await response.json()
-        setError(errorData.error || 'Registration failed')
+        const msg = errorData.error || 'Registration failed'
+        setError(msg)
+        push({ title: 'Registration failed', description: msg, type: 'error' })
       }
-    } catch (error) {
+  } catch {
       setError('An error occurred. Please try again.')
+      push({ title: 'Error', description: 'An error occurred. Please try again.', type: 'error' })
     } finally {
       setIsLoading(false)
     }
-  }
-
-  if (success) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                  Registration Successful!
-                </h2>
-                <p className="text-gray-600">
-                  Your account has been created. Redirecting to login page...
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    )
   }
 
   return (
@@ -92,11 +68,7 @@ export default function RegisterForm() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
-                  {error}
-                </div>
-              )}
+              {error && null}
 
               <div className="space-y-2">
                 <Label htmlFor="name">Name</Label>
