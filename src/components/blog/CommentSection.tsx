@@ -13,6 +13,7 @@ interface Comment {
   }
   createdAt: string
   updatedAt: string
+  parentComment?: string
   replies?: Comment[]
 }
 

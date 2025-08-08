@@ -17,7 +17,8 @@ interface Post {
   }
   tags: string[]
   categories: string[]
-  publishedAt: string
+  publishedAt?: string
+  createdAt: string
   views: number
   likes: number
 }

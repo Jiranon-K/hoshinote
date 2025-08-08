@@ -87,7 +87,6 @@ PostSchema.pre<IPost>('save', function(next) {
   next()
 })
 
-PostSchema.index({ slug: 1 })
 PostSchema.index({ author: 1 })
 PostSchema.index({ status: 1 })
 PostSchema.index({ publishedAt: -1 })

@@ -1,15 +1,9 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { MongoDBAdapter } from '@auth/mongodb-adapter'
-import { MongoClient } from 'mongodb'
 import dbConnect from './database'
 import { User } from '@/models'
 
-const client = new MongoClient(process.env.MONGODB_URI!)
-const clientPromise = Promise.resolve(client)
-
 export const authOptions: NextAuthOptions = {
-  adapter: MongoDBAdapter(clientPromise),
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -74,7 +68,6 @@ export const authOptions: NextAuthOptions = {
     }
   },
   pages: {
-    signIn: '/auth/login',
-    signUp: '/auth/register'
+    signIn: '/auth/login'
   }
 }

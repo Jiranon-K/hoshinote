@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -16,10 +17,11 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import RichTextEditor from '@/components/editor/RichTextEditor'
+import ImageUpload from '@/components/ui/image-upload'
 import { postSchema, type PostInput } from '@/lib/validations'
 
 interface PostFormProps {
-  initialData?: Partial<PostInput & { _id?: string }>
+  initialData?: Partial<PostInput & { _id?: string; content?: string }>
   isEditing?: boolean
 }
 
@@ -28,25 +30,30 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [content, setContent] = useState(initialData?.content || '')
+  const [imagePreview, setImagePreview] = useState(initialData?.coverImage || '')
+  const [imageError, setImageError] = useState(false)
   
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors }
-  } = useForm<PostInput>({
+  const form = useForm({
     resolver: zodResolver(postSchema),
+    mode: 'onChange',
     defaultValues: {
       title: initialData?.title || '',
       slug: initialData?.slug || '',
+      content: initialData?.content || '',
       excerpt: initialData?.excerpt || '',
       coverImage: initialData?.coverImage || '',
       tags: initialData?.tags || [],
       categories: initialData?.categories || [],
-      status: initialData?.status || 'draft'
+      status: (initialData?.status || 'draft') as 'draft' | 'published' | 'archived'
     }
   })
+
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = form
+
+  // Sync content state with form
+  useEffect(() => {
+    setValue('content', content || '<p></p>')
+  }, [content, setValue])
 
   const generateSlug = (title: string) => {
     return title
@@ -75,14 +82,31 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
     setValue('categories', categories)
   }
 
-  const onSubmit = async (data: PostInput) => {
+  const handleImageUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const url = e.target.value
+    setValue('coverImage', url)
+    setImagePreview(url)
+    setImageError(false)
+  }
+
+  const handleImageError = () => {
+    setImageError(true)
+  }
+
+  const removeImage = () => {
+    setValue('coverImage', '')
+    setImagePreview('')
+    setImageError(false)
+  }
+
+  const onSubmit = async (data: any) => {
     setIsLoading(true)
     setError('')
 
     try {
       const payload = {
         ...data,
-        content
+        content: content || '<p>Empty content</p>'
       }
 
       const url = isEditing 
@@ -104,7 +128,7 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
         router.refresh()
       } else {
         const errorData = await response.json()
-        setError(errorData.error || 'Failed to save post')
+        setError(errorData.error || `Failed to save post (${response.status})`)
       }
     } catch (error) {
       setError('An error occurred. Please try again.')
@@ -129,6 +153,19 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
                 {error}
+              </div>
+            )}
+
+            {Object.keys(errors).length > 0 && (
+              <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded">
+                <p className="font-medium mb-2">Please fix the following errors:</p>
+                <ul className="list-disc list-inside space-y-1">
+                  {Object.entries(errors).map(([field, error]: [string, any]) => (
+                    <li key={field} className="text-sm">
+                      <strong>{field}:</strong> {error?.message || 'Invalid value'}
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
 
@@ -174,17 +211,53 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="coverImage">Cover Image URL (Optional)</Label>
-              <Input
-                id="coverImage"
-                type="url"
-                placeholder="https://example.com/image.jpg"
-                {...register('coverImage')}
-              />
-              {errors.coverImage && (
-                <p className="text-sm text-red-600">{errors.coverImage.message}</p>
-              )}
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <ImageUpload
+                    label="Cover Image Upload"
+                    currentImage={imagePreview}
+                    onUpload={(url) => {
+                      setValue('coverImage', url)
+                      setImagePreview(url)
+                      setImageError(false)
+                    }}
+                    onRemove={removeImage}
+                  />
+                </div>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="coverImage">Or paste image URL</Label>
+                    <Input
+                      id="coverImage"
+                      type="url"
+                      placeholder="https://example.com/image.jpg"
+                      {...register('coverImage')}
+                      onChange={handleImageUrlChange}
+                    />
+                    {errors.coverImage && (
+                      <p className="text-sm text-red-600">{errors.coverImage.message}</p>
+                    )}
+                  </div>
+
+                  {imagePreview && imageError && (
+                    <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
+                      <div className="flex items-center space-x-2">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Failed to load image. Please check the URL.</span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="text-sm text-gray-500 space-y-1">
+                    <p>💡 Upload images directly or use external URLs</p>
+                    <p>📸 Images are automatically optimized via Cloudinary</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -216,6 +289,9 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
                 onChange={setContent}
                 placeholder="Start writing your post..."
               />
+              {errors.content && (
+                <p className="text-sm text-red-600">{errors.content.message}</p>
+              )}
             </div>
 
             <div className="flex items-center justify-between">
@@ -238,7 +314,7 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
                 </Select>
               </div>
 
-              <div className="flex space-x-4">
+              <div className="flex space-x-4 relative z-10">
                 <Button
                   type="button"
                   variant="outline"
@@ -248,7 +324,7 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
                 </Button>
                 <Button
                   type="submit"
-                  disabled={isLoading || !content.trim()}
+                  disabled={isLoading}
                 >
                   {isLoading 
                     ? (isEditing ? 'Updating...' : 'Creating...') 

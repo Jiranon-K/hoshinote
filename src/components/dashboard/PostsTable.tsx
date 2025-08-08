@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { format } from 'date-fns'
 import { useSession } from 'next-auth/react'
+import { formatSafeDate } from '@/lib/date-utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -25,6 +25,29 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+import { 
+  MoreHorizontal, 
+  Eye, 
+  Heart, 
+  Calendar,
+  Edit2,
+  Trash2,
+  ExternalLink,
+  Copy
+} from 'lucide-react'
 
 interface Post {
   _id: string
@@ -47,9 +70,19 @@ interface PostsTableProps {
   onPostDeleted: (postId: string) => void
 }
 
+
 export default function PostsTable({ posts, onPostDeleted }: PostsTableProps) {
   const { data: session } = useSession()
   const [deletingPost, setDeletingPost] = useState<string | null>(null)
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      // You might want to add a toast notification here
+    } catch (err) {
+      console.error('Failed to copy text: ', err)
+    }
+  }
 
   const handleDelete = async (postId: string) => {
     setDeletingPost(postId)
@@ -110,106 +143,198 @@ export default function PostsTable({ posts, onPostDeleted }: PostsTableProps) {
   }
 
   return (
-    <div className="border rounded-lg">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Title</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Author</TableHead>
-            <TableHead>Views</TableHead>
-            <TableHead>Likes</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {posts.map((post) => (
-            <TableRow key={post._id}>
-              <TableCell>
-                <div>
-                  <Link
-                    href={`/blog/${post.slug}`}
-                    className="font-medium hover:underline"
-                    target="_blank"
-                  >
-                    {post.title}
-                  </Link>
-                  <p className="text-sm text-gray-500">/{post.slug}</p>
+    <TooltipProvider>
+      <div className="border rounded-lg overflow-hidden bg-white shadow-sm">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-gray-50/50">
+              <TableHead className="font-semibold">Title</TableHead>
+              <TableHead className="font-semibold">Status</TableHead>
+              <TableHead className="font-semibold">Author</TableHead>
+              <TableHead className="font-semibold text-center">
+                <div className="flex items-center justify-center gap-1">
+                  <Eye className="w-4 h-4" />
+                  <span>Views</span>
                 </div>
-              </TableCell>
-              <TableCell>
-                {getStatusBadge(post.status)}
-              </TableCell>
-              <TableCell>
-                <div>
-                  <p className="font-medium">{post.author.name}</p>
-                  <p className="text-sm text-gray-500">{post.author.email}</p>
+              </TableHead>
+              <TableHead className="font-semibold text-center">
+                <div className="flex items-center justify-center gap-1">
+                  <Heart className="w-4 h-4" />
+                  <span>Likes</span>
                 </div>
-              </TableCell>
-              <TableCell>{post.views}</TableCell>
-              <TableCell>{post.likes}</TableCell>
-              <TableCell>
-                <div>
-                  {post.publishedAt ? (
-                    <>
-                      <p className="text-sm">
-                        Published {format(new Date(post.publishedAt), 'MMM dd, yyyy')}
-                      </p>
-                    </>
-                  ) : (
-                    <p className="text-sm text-gray-500">
-                      Created {format(new Date(post.createdAt), 'MMM dd, yyyy')}
-                    </p>
-                  )}
+              </TableHead>
+              <TableHead className="font-semibold">
+                <div className="flex items-center gap-1">
+                  <Calendar className="w-4 h-4" />
+                  <span>Date</span>
                 </div>
-              </TableCell>
-              <TableCell className="text-right">
-                <div className="flex items-center justify-end space-x-2">
-                  {canEditPost(post) && (
-                    <>
-                      <Link href={`/dashboard/posts/edit/${post._id}`}>
-                        <Button variant="outline" size="sm">
-                          Edit
-                        </Button>
-                      </Link>
-                      
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button 
-                            variant="outline" 
+              </TableHead>
+              <TableHead className="text-right font-semibold">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {posts.map((post) => (
+              <TableRow 
+                key={post._id} 
+                className="group hover:bg-gray-50/50 transition-colors duration-200"
+              >
+                <TableCell className="py-4">
+                  <div className="max-w-md">
+                    <Link
+                      href={`/blog/${post.slug}`}
+                      className="font-medium text-gray-900 hover:text-blue-600 transition-colors duration-200 line-clamp-2"
+                      target="_blank"
+                    >
+                      {post.title}
+                    </Link>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-sm text-gray-500">/{post.slug}</span>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
                             size="sm"
-                            disabled={deletingPost === post._id}
+                            className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => copyToClipboard(`${window.location.origin}/blog/${post.slug}`)}
                           >
-                            {deletingPost === post._id ? 'Deleting...' : 'Delete'}
+                            <Copy className="w-3 h-3" />
                           </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete Post</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to delete "{post.title}"? This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDelete(post._id)}
-                              className="bg-red-600 hover:bg-red-700"
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Copy link</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell className="py-4">
+                  {getStatusBadge(post.status)}
+                </TableCell>
+                <TableCell className="py-4">
+                  <div>
+                    <p className="font-medium text-gray-900">{post.author.name}</p>
+                    <p className="text-sm text-gray-500">{post.author.email}</p>
+                  </div>
+                </TableCell>
+                <TableCell className="py-4 text-center">
+                  <div className="flex items-center justify-center gap-1">
+                    <span className="font-medium">{post.views}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="py-4 text-center">
+                  <div className="flex items-center justify-center gap-1">
+                    <span className="font-medium text-red-500">{post.likes}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="py-4">
+                  <div>
+                    {post.publishedAt ? (
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">Published</p>
+                          <p className="text-xs text-gray-500">
+                            {formatSafeDate(post.publishedAt)}
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-500">Created</p>
+                          <p className="text-xs text-gray-500">
+                            {formatSafeDate(post.createdAt)}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell className="py-4 text-right">
+                  {canEditPost(post) ? (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0"
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                          <span className="sr-only">Open menu</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem asChild>
+                          <Link href={`/blog/${post.slug}`} target="_blank" className="flex items-center gap-2">
+                            <ExternalLink className="w-4 h-4" />
+                            View post
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => copyToClipboard(`${window.location.origin}/blog/${post.slug}`)}
+                          className="flex items-center gap-2"
+                        >
+                          <Copy className="w-4 h-4" />
+                          Copy link
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                          <Link href={`/dashboard/posts/edit/${post._id}`} className="flex items-center gap-2">
+                            <Edit2 className="w-4 h-4" />
+                            Edit post
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <DropdownMenuItem
+                              onSelect={(e) => e.preventDefault()}
+                              className="flex items-center gap-2 text-red-600 focus:text-red-600"
                             >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </>
+                              <Trash2 className="w-4 h-4" />
+                              Delete post
+                            </DropdownMenuItem>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete Post</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to delete "<strong>{post.title}</strong>"? This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDelete(post._id)}
+                                className="bg-red-600 hover:bg-red-700"
+                                disabled={deletingPost === post._id}
+                              >
+                                {deletingPost === post._id ? 'Deleting...' : 'Delete'}
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  ) : (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>No permissions</p>
+                      </TooltipContent>
+                    </Tooltip>
                   )}
-                </div>
-              </TableCell>
+                </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
     </div>
+    </TooltipProvider>
   )
 }

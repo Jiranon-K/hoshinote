@@ -12,7 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Separator } from '@/components/ui/separator'
 import PostsTable from '@/components/dashboard/PostsTable'
+import { Plus, Filter, Search } from 'lucide-react'
 
 interface Post {
   _id: string
@@ -43,6 +46,7 @@ export default function PostsPage() {
   const [pagination, setPagination] = useState<Pagination | null>(null)
   const [loading, setLoading] = useState(true)
   const [statusFilter, setStatusFilter] = useState('all')
+  const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
 
   const fetchPosts = async (page: number = 1, status: string = 'all') => {
@@ -94,76 +98,162 @@ export default function PostsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
             {isAdmin ? 'All Posts' : 'My Posts'}
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 mt-1">
             Manage your blog posts and track their performance.
           </p>
         </div>
         <Link href="/dashboard/posts/new">
-          <Button>Create New Post</Button>
+          <Button className="flex items-center gap-2 shadow-sm">
+            <Plus className="w-4 h-4" />
+            Create New Post
+          </Button>
         </Link>
       </div>
 
-      <div className="flex items-center space-x-4">
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Posts</SelectItem>
-            <SelectItem value="published">Published</SelectItem>
-            <SelectItem value="draft">Draft</SelectItem>
-            <SelectItem value="archived">Archived</SelectItem>
-          </SelectContent>
-        </Select>
+      <Separator />
+
+      {/* Filters and Search Section */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex items-center gap-2">
+          <Filter className="w-4 h-4 text-gray-500" />
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Posts</SelectItem>
+              <SelectItem value="published">Published</SelectItem>
+              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="archived">Archived</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div className="flex-1 max-w-md">
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
+            <Input
+              placeholder="Search posts..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        </div>
       </div>
 
       {loading ? (
-        <div className="space-y-4">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="animate-pulse border rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-64"></div>
-                  <div className="h-3 bg-gray-200 rounded w-32"></div>
-                </div>
-                <div className="flex space-x-2">
-                  <div className="h-8 bg-gray-200 rounded w-16"></div>
-                  <div className="h-8 bg-gray-200 rounded w-16"></div>
+        <div className="border rounded-lg overflow-hidden bg-white shadow-sm">
+          <div className="bg-gray-50/50 p-4 border-b">
+            <div className="grid grid-cols-7 gap-4">
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-12" />
+              <Skeleton className="h-4 w-12" />
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-16" />
+            </div>
+          </div>
+          <div className="divide-y">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="p-4">
+                <div className="grid grid-cols-7 gap-4 items-center">
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-48" />
+                    <Skeleton className="h-3 w-24" />
+                  </div>
+                  <Skeleton className="h-6 w-16 rounded-full" />
+                  <div className="space-y-1">
+                    <Skeleton className="h-3 w-24" />
+                    <Skeleton className="h-2 w-32" />
+                  </div>
+                  <Skeleton className="h-4 w-8" />
+                  <Skeleton className="h-4 w-6" />
+                  <div className="space-y-1">
+                    <Skeleton className="h-3 w-16" />
+                    <Skeleton className="h-2 w-20" />
+                  </div>
+                  <Skeleton className="h-8 w-8 rounded ml-auto" />
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       ) : (
         <>
           <PostsTable posts={posts} onPostDeleted={handlePostDeleted} />
 
           {pagination && pagination.pages > 1 && (
-            <div className="flex justify-center items-center space-x-4">
-              <Button
-                variant="outline"
-                disabled={currentPage === 1 || loading}
-                onClick={() => handlePageChange(currentPage - 1)}
-              >
-                Previous
-              </Button>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
+              <div className="text-sm text-gray-600">
+                Showing <span className="font-medium">{(currentPage - 1) * pagination.limit + 1}</span> to{' '}
+                <span className="font-medium">
+                  {Math.min(currentPage * pagination.limit, pagination.total)}
+                </span> of{' '}
+                <span className="font-medium">{pagination.total}</span> posts
+              </div>
               
-              <span className="text-sm text-gray-600">
-                Page {currentPage} of {pagination.pages} ({pagination.total} posts)
-              </span>
-              
-              <Button
-                variant="outline"
-                disabled={currentPage === pagination.pages || loading}
-                onClick={() => handlePageChange(currentPage + 1)}
-              >
-                Next
-              </Button>
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage === 1 || loading}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                >
+                  Previous
+                </Button>
+                
+                <div className="flex items-center gap-1">
+                  {[...Array(Math.min(5, pagination.pages))].map((_, i) => {
+                    const page = i + 1
+                    const isCurrentPage = page === currentPage
+                    
+                    return (
+                      <Button
+                        key={page}
+                        variant={isCurrentPage ? "default" : "outline"}
+                        size="sm"
+                        className="w-8 h-8 p-0"
+                        onClick={() => handlePageChange(page)}
+                        disabled={loading}
+                      >
+                        {page}
+                      </Button>
+                    )
+                  })}
+                  
+                  {pagination.pages > 5 && currentPage < pagination.pages - 2 && (
+                    <>
+                      <span className="px-1">...</span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-8 h-8 p-0"
+                        onClick={() => handlePageChange(pagination.pages)}
+                        disabled={loading}
+                      >
+                        {pagination.pages}
+                      </Button>
+                    </>
+                  )}
+                </div>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage === pagination.pages || loading}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                >
+                  Next
+                </Button>
+              </div>
             </div>
           )}
         </>

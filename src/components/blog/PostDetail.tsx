@@ -1,6 +1,6 @@
-import { format } from 'date-fns'
 import { Badge } from '@/components/ui/badge'
 import CommentSection from './CommentSection'
+import { formatSafeDate } from '@/lib/date-utils'
 
 interface PostDetailProps {
   post: {
@@ -16,11 +16,13 @@ interface PostDetailProps {
     }
     tags: string[]
     categories: string[]
-    publishedAt: string
+    publishedAt?: string
+    createdAt: string
     views: number
     likes: number
   }
 }
+
 
 export default function PostDetail({ post }: PostDetailProps) {
   return (
@@ -70,10 +72,14 @@ export default function PostDetail({ post }: PostDetailProps) {
             <div>
               <p className="font-medium text-gray-900">{post.author.name}</p>
               <time
-                dateTime={post.publishedAt}
+                dateTime={post.publishedAt || post.createdAt}
                 className="text-sm text-gray-500"
               >
-                {format(new Date(post.publishedAt), 'MMMM dd, yyyy')}
+                {post.publishedAt ? (
+                  <>Published {formatSafeDate(post.publishedAt, 'MMMM dd, yyyy')}</>
+                ) : (
+                  <>Created {formatSafeDate(post.createdAt, 'MMMM dd, yyyy')}</>
+                )}
               </time>
             </div>
           </div>
@@ -113,31 +119,6 @@ export default function PostDetail({ post }: PostDetailProps) {
           ))}
         </div>
 
-        <div className="bg-gray-50 rounded-lg p-6">
-          <div className="flex items-center space-x-4">
-            <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center">
-              {post.author.avatar ? (
-                <img
-                  src={post.author.avatar}
-                  alt={post.author.name}
-                  className="w-full h-full rounded-full object-cover"
-                />
-              ) : (
-                <span className="text-lg font-medium text-gray-600">
-                  {post.author.name.charAt(0).toUpperCase()}
-                </span>
-              )}
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">
-                {post.author.name}
-              </h3>
-              <p className="text-gray-600">
-                Author at Hoshilog
-              </p>
-            </div>
-          </div>
-        </div>
       </footer>
 
       <CommentSection postId={post._id} />

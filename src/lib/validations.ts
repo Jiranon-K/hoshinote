@@ -18,11 +18,11 @@ export const registerSchema = z.object({
 export const postSchema = z.object({
   title: z.string().min(1, 'Title is required').max(100, 'Title cannot be more than 100 characters'),
   slug: z.string().min(1, 'Slug is required').regex(/^[a-z0-9-]+$/, 'Slug can only contain lowercase letters, numbers, and hyphens'),
-  content: z.string().min(1, 'Content is required'),
+  content: z.string().default('<p></p>'),
   excerpt: z.string().min(1, 'Excerpt is required').max(200, 'Excerpt cannot be more than 200 characters'),
-  coverImage: z.string().optional(),
-  tags: z.array(z.string()).optional(),
-  categories: z.array(z.string()).optional(),
+  coverImage: z.string().default(''),
+  tags: z.array(z.string()).default([]),
+  categories: z.array(z.string()).default([]),
   status: z.enum(['draft', 'published', 'archived']).default('draft')
 })
 

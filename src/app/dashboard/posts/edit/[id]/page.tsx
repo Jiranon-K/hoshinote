@@ -22,16 +22,18 @@ async function getPost(id: string, userId: string, userRole: string) {
       return null
     }
 
+    const postData = post as any
+
     return {
-      _id: post._id.toString(),
-      title: post.title,
-      slug: post.slug,
-      content: post.content,
-      excerpt: post.excerpt,
-      coverImage: post.coverImage || '',
-      tags: post.tags,
-      categories: post.categories,
-      status: post.status
+      _id: postData._id.toString(),
+      title: postData.title,
+      slug: postData.slug,
+      content: postData.content,
+      excerpt: postData.excerpt,
+      coverImage: postData.coverImage || '',
+      tags: postData.tags || [],
+      categories: postData.categories || [],
+      status: postData.status
     }
   } catch (error) {
     console.error('Error fetching post:', error)

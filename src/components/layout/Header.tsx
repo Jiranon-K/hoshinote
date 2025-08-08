@@ -145,10 +145,21 @@ export default function Header() {
                 {session && (
                   <div className="mt-6 space-y-4">
                     <div className="flex items-center gap-3 rounded-md border p-3">
-                      <Avatar className="size-9">
-                        {session.user.avatar && <AvatarImage src={session.user.avatar} alt={session.user.name || 'User'} />}
-                        <AvatarFallback>{(session.user.name || 'U').split(' ').map(p => p[0]).join('').slice(0,2).toUpperCase()}</AvatarFallback>
-                      </Avatar>
+                      <div className="relative h-9 w-9 rounded-full overflow-hidden bg-gray-100 ring-2 ring-gray-200 shrink-0">
+                        {session.user.avatar ? (
+                          <img
+                            src={session.user.avatar}
+                            alt={session.user.name || 'User'}
+                            className="h-full w-full object-cover object-center"
+                          />
+                        ) : (
+                          <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
+                            <span className="text-white text-sm font-medium">
+                              {(session.user.name || 'U').split(' ').map(p => p[0]).join('').slice(0,2).toUpperCase()}
+                            </span>
+                          </div>
+                        )}
+                      </div>
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium">{session.user.name}</p>
                         <p className="truncate text-xs text-muted-foreground">{session.user.email}</p>
@@ -185,10 +196,21 @@ export default function Header() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="flex items-center gap-2 rounded-full pl-1 pr-3" size="sm">
-                    <Avatar className="size-6">
-                      {session.user.avatar && <AvatarImage src={session.user.avatar} alt={session.user.name || 'User'} />}
-                      <AvatarFallback className="text-[10px]">{(session.user.name || 'U').substring(0,2).toUpperCase()}</AvatarFallback>
-                    </Avatar>
+                    <div className="relative h-6 w-6 rounded-full overflow-hidden bg-gray-100 ring-1 ring-gray-200">
+                      {session.user.avatar ? (
+                        <img
+                          src={session.user.avatar}
+                          alt={session.user.name || 'User'}
+                          className="h-full w-full object-cover object-center"
+                        />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
+                          <span className="text-white text-[10px] font-medium">
+                            {(session.user.name || 'U').substring(0,2).toUpperCase()}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                     <span className="hidden max-w-[90px] truncate sm:inline text-xs font-medium">{session.user.name}</span>
                   </Button>
                 </DropdownMenuTrigger>

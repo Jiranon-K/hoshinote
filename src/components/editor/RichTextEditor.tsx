@@ -2,7 +2,9 @@
 
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
+import Image from '@tiptap/extension-image'
 import { Button } from '@/components/ui/button'
+import { useState, useRef } from 'react'
 
 interface RichTextEditorProps {
   content: string
@@ -15,12 +17,22 @@ export default function RichTextEditor({
   onChange, 
   placeholder = "Start writing..." 
 }: RichTextEditorProps) {
+  const [isUploading, setIsUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
         heading: {
           levels: [1, 2, 3]
         }
+      }),
+      Image.configure({
+        inline: false,
+        allowBase64: false,
+        HTMLAttributes: {
+          class: 'max-w-full h-auto rounded-lg',
+        },
       })
     ],
     content,
@@ -34,6 +46,48 @@ export default function RichTextEditor({
       }
     }
   })
+
+  const addImage = async (file: File) => {
+    setIsUploading(true)
+    
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const result = await response.json()
+
+      if (response.ok) {
+        editor?.chain().focus().setImage({ src: result.url }).run()
+      }
+    } catch (error) {
+      console.error('Upload failed:', error)
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  const addImageFromUrl = () => {
+    const url = window.prompt('Enter image URL:')
+    if (url) {
+      editor?.chain().focus().setImage({ src: url }).run()
+    }
+  }
+
+  const handleImageUpload = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      addImage(file)
+    }
+  }
 
   if (!editor) {
     return null
@@ -146,6 +200,35 @@ export default function RichTextEditor({
           type="button"
           variant="outline"
           size="sm"
+          onClick={handleImageUpload}
+          disabled={isUploading}
+        >
+          {isUploading ? (
+            <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+          ) : (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          )}
+        </Button>
+
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={addImageFromUrl}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+          </svg>
+        </Button>
+
+        <div className="w-px h-6 bg-gray-300" />
+
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
           onClick={() => editor.chain().focus().undo().run()}
           disabled={!editor.can().undo()}
         >
@@ -171,6 +254,14 @@ export default function RichTextEditor({
         editor={editor} 
         className="min-h-[300px]"
         placeholder={placeholder}
+      />
+      
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        className="hidden"
       />
     </div>
   )
