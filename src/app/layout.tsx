@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "@/components/providers/SessionProvider";
+import AlertProvider from "@/components/providers/AlertProvider";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { siteConfig } from "@/config/site";
@@ -65,13 +66,15 @@ export default function RootLayout({
       <body
         className={`${nunito.variable} antialiased min-h-screen flex flex-col font-nunito`}
       >
-        <AuthProvider>
-          <Header />
-          <main className="flex-1">
-            {children}
-          </main>
-          <Footer />
-        </AuthProvider>
+        <AlertProvider>
+          <AuthProvider>
+            <Header />
+            <main className="flex-1">
+              {children}
+            </main>
+            <Footer />
+          </AuthProvider>
+        </AlertProvider>
       </body>
     </html>
   );

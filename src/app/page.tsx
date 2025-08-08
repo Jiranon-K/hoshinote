@@ -1,12 +1,19 @@
 'use client'
 
 import Link from "next/link";
+import { useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { Terminal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
+import { useAlert } from "@/components/providers/AlertProvider";
 
 export default function Home() {
   const { data: session, status } = useSession()
+  const { show } = useAlert()
+  useEffect(() => {
+    show({ title: "Heads up!", description: "You can add components to your app using the cli.", icon: <Terminal className="h-4 w-4" /> })
+  }, [show])
   
   return (
     <div className="container mx-auto px-4 py-16">
