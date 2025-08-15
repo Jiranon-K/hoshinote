@@ -31,9 +31,9 @@ export default function PostCard({ post }: PostCardProps) {
   const [imageLoading, setImageLoading] = useState(true)
 
   return (
-    <Card className="h-full hover:shadow-lg transition-shadow">
+    <Card className="h-full hover:shadow-xl transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] group cursor-pointer border hover:border-primary/20">
       {post.coverImage && !imageError && (
-        <Link href={`/blog/${post.slug}`}>
+        <Link href={`/blog/${post.slug}`} className="cursor-pointer">
           <div className="relative h-48 overflow-hidden rounded-t-lg bg-gray-100">
             {imageLoading && (
               <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
@@ -44,7 +44,7 @@ export default function PostCard({ post }: PostCardProps) {
               src={post.coverImage}
               alt={post.title}
               fill
-              className="object-cover hover:scale-105 transition-transform duration-300"
+              className="object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
               onLoad={() => setImageLoading(false)}
               onError={() => {
                 setImageError(true)
@@ -56,10 +56,10 @@ export default function PostCard({ post }: PostCardProps) {
         </Link>
       )}
       {(!post.coverImage || imageError) && (
-        <Link href={`/blog/${post.slug}`}>
-          <div className="relative h-48 overflow-hidden rounded-t-lg bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center hover:from-blue-200 hover:to-purple-200 transition-colors duration-300">
-            <div className="text-center text-gray-500">
-              <svg className="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <Link href={`/blog/${post.slug}`} className="cursor-pointer">
+          <div className="relative h-48 overflow-hidden rounded-t-lg bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center group-hover:from-blue-200 group-hover:to-purple-200 transition-all duration-500">
+            <div className="text-center text-gray-500 group-hover:scale-105 transition-transform duration-300">
+              <svg className="w-12 h-12 mx-auto mb-2 opacity-50 group-hover:opacity-70 transition-opacity duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               <span className="text-sm font-medium">{post.title}</span>
@@ -76,8 +76,8 @@ export default function PostCard({ post }: PostCardProps) {
             {formatSafeDate(post.publishedAt || post.createdAt)}
           </time>
         </div>
-        <Link href={`/blog/${post.slug}`} className="hover:underline">
-          <h3 className="text-xl font-semibold text-gray-900 line-clamp-2">
+        <Link href={`/blog/${post.slug}`} className="hover:underline group/title cursor-pointer">
+          <h3 className="text-xl font-semibold text-gray-900 line-clamp-2 group-hover/title:text-primary transition-colors duration-300">
             {post.title}
           </h3>
         </Link>
@@ -90,12 +90,12 @@ export default function PostCard({ post }: PostCardProps) {
         <div className="flex items-center justify-between">
           <div className="flex flex-wrap gap-2">
             {post.tags.slice(0, 2).map((tag) => (
-              <Badge key={tag} variant="secondary" className="text-xs">
+              <Badge key={tag} variant="secondary" className="text-xs hover:bg-primary hover:text-primary-foreground transition-colors duration-200 cursor-pointer">
                 {tag}
               </Badge>
             ))}
             {post.tags.length > 2 && (
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="outline" className="text-xs hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors duration-200 cursor-pointer">
                 +{post.tags.length - 2}
               </Badge>
             )}

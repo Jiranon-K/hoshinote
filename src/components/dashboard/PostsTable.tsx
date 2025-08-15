@@ -135,8 +135,8 @@ export default function PostsTable({ posts, onPostDeleted }: PostsTableProps) {
         <p className="text-gray-500 mb-4">
           Get started by creating your first blog post.
         </p>
-        <Link href="/dashboard/posts/new">
-          <Button>Create New Post</Button>
+        <Link href="/dashboard/posts/new" className="cursor-pointer">
+          <Button className="cursor-pointer">Create New Post</Button>
         </Link>
       </div>
     )
@@ -194,10 +194,10 @@ export default function PostsTable({ posts, onPostDeleted }: PostsTableProps) {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110 hover:bg-primary/10"
                             onClick={() => copyToClipboard(`${window.location.origin}/blog/${post.slug}`)}
                           >
-                            <Copy className="w-3 h-3" />
+                            <Copy className="w-3 h-3 transition-transform duration-200 hover:rotate-12" />
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -258,30 +258,30 @@ export default function PostsTable({ posts, onPostDeleted }: PostsTableProps) {
                         <Button 
                           variant="ghost" 
                           size="sm" 
-                          className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0"
+                          className="opacity-0 group-hover:opacity-100 transition-all duration-200 h-8 w-8 p-0 hover:scale-110 hover:bg-primary/10"
                         >
-                          <MoreHorizontal className="h-4 w-4" />
+                          <MoreHorizontal className="h-4 w-4 transition-transform duration-200 hover:rotate-90" />
                           <span className="sr-only">Open menu</span>
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
                         <DropdownMenuItem asChild>
-                          <Link href={`/blog/${post.slug}`} target="_blank" className="flex items-center gap-2">
-                            <ExternalLink className="w-4 h-4" />
+                          <Link href={`/blog/${post.slug}`} target="_blank" className="flex items-center gap-2 transition-all duration-200 hover:scale-105 group/item">
+                            <ExternalLink className="w-4 h-4 transition-transform duration-200 group-hover/item:rotate-12" />
                             View post
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => copyToClipboard(`${window.location.origin}/blog/${post.slug}`)}
-                          className="flex items-center gap-2"
+                          className="flex items-center gap-2 transition-all duration-200 hover:scale-105 group/item"
                         >
-                          <Copy className="w-4 h-4" />
+                          <Copy className="w-4 h-4 transition-transform duration-200 group-hover/item:rotate-12" />
                           Copy link
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
-                          <Link href={`/dashboard/posts/edit/${post._id}`} className="flex items-center gap-2">
-                            <Edit2 className="w-4 h-4" />
+                          <Link href={`/dashboard/posts/edit/${post._id}`} className="flex items-center gap-2 transition-all duration-200 hover:scale-105 group/item">
+                            <Edit2 className="w-4 h-4 transition-transform duration-200 group-hover/item:rotate-12" />
                             Edit post
                           </Link>
                         </DropdownMenuItem>

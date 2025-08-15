@@ -7,9 +7,9 @@ import { commentSchema } from '@/lib/validations'
 import { Types } from 'mongoose'
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export async function GET(
@@ -19,7 +19,7 @@ export async function GET(
   try {
     await dbConnect()
     
-    const { id } = params
+    const { id } = await params
     
     if (!Types.ObjectId.isValid(id)) {
       return NextResponse.json(
@@ -90,7 +90,7 @@ export async function POST(
     
     await dbConnect()
     
-    const { id } = params
+    const { id } = await params
     
     if (!Types.ObjectId.isValid(id)) {
       return NextResponse.json(

@@ -1,6 +1,6 @@
-# 🌟 Hoshilog
+# 🌟 Hoshi-Note
 
-A modern, full-featured blog platform built with Next.js 15, TypeScript, and MongoDB. Create, manage, and share your content with a powerful and intuitive interface.
+A modern, full-featured note-taking and blog platform built with Next.js 15, TypeScript, and MongoDB. Create, manage, and share your content with a powerful and intuitive interface.
 
 ## ✨ Features
 

@@ -3,9 +3,9 @@ import dbConnect from '@/lib/database'
 import { Post } from '@/models'
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 export async function GET(
@@ -15,7 +15,7 @@ export async function GET(
   try {
     await dbConnect()
     
-    const { slug } = params
+    const { slug } = await params
     
     const post = await Post.findOne({ slug, status: 'published' })
       .populate('author', 'name email avatar')

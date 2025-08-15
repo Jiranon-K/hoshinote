@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       cloudinary.uploader.upload_stream(
         {
           resource_type: 'image',
-          folder: 'hoshilog',
+          folder: 'hoshi-note',
           transformation: [
             { width: 800, height: 800, crop: 'fill', gravity: 'face:center', quality: 'auto:good' },
             { fetch_format: 'auto' }

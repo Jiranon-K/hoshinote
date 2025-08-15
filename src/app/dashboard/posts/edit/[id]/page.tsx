@@ -6,9 +6,9 @@ import dbConnect from '@/lib/database'
 import { Post } from '@/models'
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 async function getPost(id: string, userId: string, userRole: string) {
@@ -48,7 +48,8 @@ export default async function EditPostPage({ params }: PageProps) {
     return notFound()
   }
   
-  const post = await getPost(params.id, session.user.id, session.user.role)
+  const { id } = await params
+  const post = await getPost(id, session.user.id, session.user.role)
   
   if (!post) {
     return notFound()

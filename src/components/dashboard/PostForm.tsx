@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -16,9 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import RichTextEditor from '@/components/editor/RichTextEditor'
+import EditorJS from '@/components/editor/EditorJS'
 import ImageUpload from '@/components/ui/image-upload'
 import { postSchema, type PostInput } from '@/lib/validations'
+import { OutputData } from '@editorjs/editorjs'
 
 interface PostFormProps {
   initialData?: Partial<PostInput & { _id?: string; content?: string }>
@@ -29,7 +29,11 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const [content, setContent] = useState(initialData?.content || '')
+  const [content, setContent] = useState<OutputData | null>(
+    initialData?.content 
+      ? (typeof initialData.content === 'string' ? JSON.parse(initialData.content) : initialData.content)
+      : null
+  )
   const [imagePreview, setImagePreview] = useState(initialData?.coverImage || '')
   const [imageError, setImageError] = useState(false)
   
@@ -52,7 +56,7 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
 
   // Sync content state with form
   useEffect(() => {
-    setValue('content', content || '<p></p>')
+    setValue('content', content ? JSON.stringify(content) : JSON.stringify({ blocks: [], version: "2.30.8" }))
   }, [content, setValue])
 
   const generateSlug = (title: string) => {
@@ -89,9 +93,6 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
     setImageError(false)
   }
 
-  const handleImageError = () => {
-    setImageError(true)
-  }
 
   const removeImage = () => {
     setValue('coverImage', '')
@@ -99,14 +100,14 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
     setImageError(false)
   }
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: PostInput) => {
     setIsLoading(true)
     setError('')
 
     try {
       const payload = {
         ...data,
-        content: content || '<p>Empty content</p>'
+        content: content ? JSON.stringify(content) : JSON.stringify({ blocks: [], version: "2.30.8" })
       }
 
       const url = isEditing 
@@ -130,7 +131,7 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
         const errorData = await response.json()
         setError(errorData.error || `Failed to save post (${response.status})`)
       }
-    } catch (error) {
+    } catch {
       setError('An error occurred. Please try again.')
     } finally {
       setIsLoading(false)
@@ -160,7 +161,7 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
               <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded">
                 <p className="font-medium mb-2">Please fix the following errors:</p>
                 <ul className="list-disc list-inside space-y-1">
-                  {Object.entries(errors).map(([field, error]: [string, any]) => (
+                  {Object.entries(errors).map(([field, error]) => (
                     <li key={field} className="text-sm">
                       <strong>{field}:</strong> {error?.message || 'Invalid value'}
                     </li>
@@ -284,8 +285,8 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
 
             <div className="space-y-2">
               <Label>Content</Label>
-              <RichTextEditor 
-                content={content}
+              <EditorJS 
+                data={content}
                 onChange={setContent}
                 placeholder="Start writing your post..."
               />

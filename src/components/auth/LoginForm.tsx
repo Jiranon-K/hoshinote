@@ -87,7 +87,7 @@ export default function LoginForm() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              <Link href="#" className="text-xs text-muted-foreground hover:underline">Forgot your password?</Link>
+              <Link href="#" className="text-xs text-muted-foreground hover:underline hover:text-primary transition-colors duration-200">Forgot your password?</Link>
             </div>
             <Input
               id="password"
@@ -108,7 +108,7 @@ export default function LoginForm() {
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{' '}
-          <Link href="/auth/register" className="underline underline-offset-4 hover:text-primary">Sign up</Link>
+          <Link href="/auth/register" className="underline underline-offset-4 hover:text-primary transition-colors duration-200 hover:scale-105 inline-block">Sign up</Link>
         </p>
       </CardContent>
     </Card>

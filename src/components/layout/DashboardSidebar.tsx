@@ -84,8 +84,8 @@ export default function DashboardSidebar() {
   return (
     <div className="flex flex-col w-64 bg-white border-r border-gray-200">
       <div className="flex items-center justify-center h-16 border-b border-gray-200">
-        <Link href="/" className="text-xl font-bold text-gray-900">
-          Hoshilog
+        <Link href="/" className="text-xl font-bold text-gray-900 cursor-pointer">
+          Hoshi-Note
         </Link>
       </div>
       
@@ -95,7 +95,7 @@ export default function DashboardSidebar() {
             key={item.name}
             href={item.href}
             className={cn(
-              'flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors',
+              'flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer',
               pathname === item.href
                 ? 'bg-gray-100 text-gray-900'
                 : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'

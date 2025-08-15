@@ -2,9 +2,9 @@ import { notFound } from 'next/navigation'
 import PostDetail from '@/components/blog/PostDetail'
 
 interface PageProps {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 async function getPost(slug: string) {
@@ -29,7 +29,8 @@ async function getPost(slug: string) {
 }
 
 export async function generateMetadata({ params }: PageProps) {
-  const post = await getPost(params.slug)
+  const { slug } = await params
+  const post = await getPost(slug)
   
   if (!post) {
     return {
@@ -49,7 +50,8 @@ export async function generateMetadata({ params }: PageProps) {
 }
 
 export default async function BlogPostPage({ params }: PageProps) {
-  const post = await getPost(params.slug)
+  const { slug } = await params
+  const post = await getPost(slug)
   
   if (!post) {
     notFound()

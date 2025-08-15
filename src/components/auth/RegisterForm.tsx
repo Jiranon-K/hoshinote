@@ -58,7 +58,7 @@ export default function RegisterForm() {
     <Card className="border-0 shadow-none">
       <CardHeader className="p-0 mb-6">
         <CardTitle className="text-2xl font-semibold tracking-tight text-center">Create your account</CardTitle>
-        <CardDescription className="text-center text-sm">Join Hoshilog and start sharing your thoughts</CardDescription>
+        <CardDescription className="text-center text-sm">Join Hoshi-Note and start sharing your thoughts</CardDescription>
       </CardHeader>
       <CardContent className="p-0">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -128,7 +128,7 @@ export default function RegisterForm() {
         </form>
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Already have an account?{' '}
-          <Link href="/auth/login" className="underline underline-offset-4 hover:text-primary">Sign in</Link>
+          <Link href="/auth/login" className="underline underline-offset-4 hover:text-primary transition-colors duration-200 hover:scale-105 inline-block">Sign in</Link>
         </p>
       </CardContent>
     </Card>

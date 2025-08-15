@@ -70,8 +70,8 @@ export default function DashboardPage() {
             Here's what's happening with your {isAdmin ? 'platform' : 'blog'}.
           </p>
         </div>
-        <Link href="/dashboard/posts/new">
-          <Button>Create New Post</Button>
+        <Link href="/dashboard/posts/new" className="cursor-pointer">
+          <Button className="cursor-pointer">Create New Post</Button>
         </Link>
       </div>
 
@@ -133,8 +133,8 @@ export default function DashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Link href="/dashboard/posts/new" className="block">
-              <Button variant="outline" className="w-full justify-start">
+            <Link href="/dashboard/posts/new" className="block cursor-pointer">
+              <Button variant="outline" className="w-full justify-start cursor-pointer">
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
@@ -142,8 +142,8 @@ export default function DashboardPage() {
               </Button>
             </Link>
             
-            <Link href="/dashboard/posts" className="block">
-              <Button variant="outline" className="w-full justify-start">
+            <Link href="/dashboard/posts" className="block cursor-pointer">
+              <Button variant="outline" className="w-full justify-start cursor-pointer">
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
@@ -151,8 +151,8 @@ export default function DashboardPage() {
               </Button>
             </Link>
             
-            <Link href="/dashboard/profile" className="block">
-              <Button variant="outline" className="w-full justify-start">
+            <Link href="/dashboard/profile" className="block cursor-pointer">
+              <Button variant="outline" className="w-full justify-start cursor-pointer">
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
@@ -174,7 +174,7 @@ export default function DashboardPage() {
               <div className="flex items-center space-x-4">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium">Welcome to Hoshilog!</p>
+                  <p className="text-sm font-medium">Welcome to Hoshi-Note!</p>
                   <p className="text-xs text-gray-500">Get started by creating your first post</p>
                 </div>
               </div>

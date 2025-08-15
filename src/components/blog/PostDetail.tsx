@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge'
 import CommentSection from './CommentSection'
 import { formatSafeDate } from '@/lib/date-utils'
+import EditorJSRenderer from '@/components/editor/EditorJSRenderer'
 
 interface PostDetailProps {
   post: {
@@ -102,9 +103,9 @@ export default function PostDetail({ post }: PostDetailProps) {
         </div>
       </header>
 
-      <div className="prose prose-lg max-w-none mb-8">
-        <div
-          dangerouslySetInnerHTML={{ __html: post.content }}
+      <div className="mb-8">
+        <EditorJSRenderer 
+          data={post.content}
           className="text-gray-800 leading-relaxed"
         />
       </div>

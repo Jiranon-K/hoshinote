@@ -6,9 +6,9 @@ import { Comment } from '@/models'
 import { Types } from 'mongoose'
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export async function PUT(
@@ -27,7 +27,7 @@ export async function PUT(
     
     await dbConnect()
     
-    const { id } = params
+    const { id } = await params
     
     if (!Types.ObjectId.isValid(id)) {
       return NextResponse.json(
@@ -91,7 +91,7 @@ export async function DELETE(
     
     await dbConnect()
     
-    const { id } = params
+    const { id } = await params
     
     if (!Types.ObjectId.isValid(id)) {
       return NextResponse.json(

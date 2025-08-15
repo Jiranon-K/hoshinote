@@ -1,15 +1,15 @@
 export const siteConfig = {
-  name: "Hoshilog",
-  description: "A modern blog platform built with Next.js, TypeScript, and MongoDB",
+  name: "Hoshi-Note",
+  description: "A modern note-taking and blog platform built with Next.js, TypeScript, and MongoDB",
   url: process.env.NEXTAUTH_URL || "http://localhost:3000",
   ogImage: "/og-image.jpg",
   links: {
-    twitter: "https://twitter.com/hoshilog",
-    github: "https://github.com/hoshilog/hoshilog",
+    twitter: "https://twitter.com/hoshinote",
+    github: "https://github.com/hoshinote/hoshi-note",
   },
   authors: {
-    default: "Hoshilog Team",
-    email: "hello@hoshilog.com"
+    default: "Hoshi-Note Team",
+    email: "hello@hoshi-note.com"
   },
   features: {
     comments: true,

@@ -80,16 +80,16 @@ export default function CommentForm({
 
   if (!session) {
     return (
-      <div className="bg-gray-50 rounded-lg p-6 text-center">
+      <div className="bg-gray-50 rounded-lg p-6 text-center hover:bg-gray-100 transition-colors duration-300">
         <p className="text-gray-600 mb-4">
           You need to be logged in to comment.
         </p>
         <div className="space-x-4">
           <Link href="/auth/login">
-            <Button size="sm">Sign In</Button>
+            <Button size="sm" className="hover:scale-105 transition-transform duration-200">Sign In</Button>
           </Link>
           <Link href="/auth/register">
-            <Button variant="outline" size="sm">Sign Up</Button>
+            <Button variant="outline" size="sm" className="hover:scale-105 transition-transform duration-200">Sign Up</Button>
           </Link>
         </div>
       </div>
@@ -99,12 +99,12 @@ export default function CommentForm({
   return (
     <div className="space-y-4">
       <div className="flex items-center space-x-3">
-        <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+        <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-200 cursor-pointer">
           {session.user.avatar ? (
             <img
               src={session.user.avatar}
               alt={session.user.name}
-              className="w-full h-full rounded-full object-cover"
+              className="w-full h-full rounded-full object-cover transition-transform duration-200 hover:scale-105"
             />
           ) : (
             <span className="text-sm font-medium text-gray-600">
@@ -112,7 +112,7 @@ export default function CommentForm({
             </span>
           )}
         </div>
-        <span className="font-medium text-gray-900">{session.user.name}</span>
+        <span className="font-medium text-gray-900 hover:text-primary transition-colors duration-200 cursor-pointer">{session.user.name}</span>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -130,7 +130,7 @@ export default function CommentForm({
             id="content"
             rows={3}
             placeholder={placeholder}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none hover:border-primary/50 transition-colors duration-200 cursor-text"
             {...register('content')}
           />
           {errors.content && (
