@@ -14,6 +14,7 @@ declare module 'next-auth' {
   interface User {
     role: string
     avatar?: string
+    rememberMe?: boolean
   }
 }
 
@@ -21,5 +22,6 @@ declare module 'next-auth/jwt' {
   interface JWT {
     role: string
     avatar?: string
+    rememberMe?: boolean
   }
 }

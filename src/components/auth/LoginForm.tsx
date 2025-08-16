@@ -43,6 +43,7 @@ export default function LoginForm() {
       const result = await signIn('credentials', {
         email: data.email,
         password: data.password,
+        rememberMe: data.rememberMe,
         redirect: false
       })
 

@@ -11,17 +11,20 @@ export const authOptions: NextAuthOptions = {
       name: 'credentials',
       credentials: {
         email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' }
+        password: { label: 'Password', type: 'password' },
+        rememberMe: { label: 'Remember Me', type: 'checkbox' }
       },
       async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) {
           return null
         }
 
-        // Rate limiting by email
+        const rememberMe = credentials.rememberMe === 'true'
+
+       
         const rateLimitResult = rateLimit(`login:${credentials.email}`, {
           maxAttempts: 5,
-          windowMs: 15 * 60 * 1000 // 15 minutes
+          windowMs: 15 * 60 * 1000 
         })
 
         if (!rateLimitResult.success) {
@@ -45,7 +48,7 @@ export const authOptions: NextAuthOptions = {
             return null
           }
 
-          // Clear rate limit on successful login
+          
           clearRateLimit(`login:${credentials.email}`)
 
           return {
@@ -53,7 +56,8 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             name: user.name,
             role: user.role,
-            avatar: user.avatar
+            avatar: user.avatar,
+            rememberMe
           }
         } catch (error) {
           logger.error('Auth error:', error)
@@ -63,16 +67,25 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   session: {
-    strategy: 'jwt'
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, 
   },
   callbacks: {
     async jwt({ token, user, trigger, session }) {
       if (user) {
         token.role = user.role
         token.avatar = user.avatar
+        token.rememberMe = user.rememberMe
+        
+       
+        if (user.rememberMe) {
+          token.exp = Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60) // 30 days
+        } else {
+          token.exp = Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 1 day
+        }
       }
       
-      // Handle session updates
+    
       if (trigger === 'update' && session) {
         token.name = session.name || token.name
         token.email = session.email || token.email
