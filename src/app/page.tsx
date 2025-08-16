@@ -89,7 +89,7 @@ export default function Home() {
           </div>
 
           {loading ? (
-            <div className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="animate-pulse">
                   <div className="bg-gray-200 rounded-3xl h-80"></div>
@@ -97,7 +97,7 @@ export default function Home() {
               ))}
             </div>
           ) : (
-            <div className="space-y-8 max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {featuredPosts.map((post, index) => (
                 <Link key={post._id} href={`/blog/${post.slug}`}>
                   <article className="group cursor-pointer transform transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl">
@@ -121,9 +121,6 @@ export default function Home() {
                       <div className="absolute top-6 right-6 flex items-center gap-3">
                         <div className="bg-white/20 backdrop-blur-md rounded-full px-4 py-2 text-white text-sm font-medium border border-white/20">
                           {post.views} views
-                        </div>
-                        <div className="bg-white/20 backdrop-blur-md rounded-full px-4 py-2 text-white text-sm font-medium border border-white/20">
-                          ❤️ {post.likes}
                         </div>
                       </div>
                       

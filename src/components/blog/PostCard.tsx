@@ -37,7 +37,7 @@ export default function PostCard({ post }: PostCardProps) {
     <Card className="h-full hover:shadow-xl transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] group cursor-pointer border hover:border-primary/20">
       {post.coverImage && !imageError && (
         <Link href={`/blog/${post.slug}`} className="cursor-pointer">
-          <div className="relative h-48 overflow-hidden rounded-t-lg bg-gray-100">
+          <div className="relative h-48 overflow-hidden bg-gray-100">
             {imageLoading && (
               <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
                 <div className="w-8 h-8 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
