@@ -28,6 +28,15 @@ export const metadata: Metadata = {
   ],
   creator: siteConfig.authors.default,
   metadataBase: new URL(siteConfig.url),
+  icons: {
+    icon: '/icon.png',
+    shortcut: '/icon.png',
+    apple: '/icon.png',
+    other: {
+      rel: 'icon',
+      url: '/icon.png',
+    },
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
