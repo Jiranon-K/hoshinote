@@ -1,7 +1,15 @@
+const getBaseUrl = () => {
+  const url = process.env.NEXTAUTH_URL || "http://localhost:3000";
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  return `https://${url}`;
+};
+
 export const siteConfig = {
   name: "Hoshi-Note",
   description: "A modern note-taking and blog platform built with Next.js, TypeScript, and MongoDB",
-  url: process.env.NEXTAUTH_URL || "http://localhost:3000",
+  url: getBaseUrl(),
   ogImage: "/og-image.jpg",
   links: {
     twitter: "https://twitter.com/hoshinote",
