@@ -53,8 +53,8 @@ export function handleAPIError(error: unknown) {
   )
 }
 
-export function validateRequiredFields(data: Record<string, any>, fields: string[]) {
-  const missing = fields.filter(field => !data[field] || data[field].trim() === '')
+export function validateRequiredFields(data: Record<string, unknown>, fields: string[]) {
+  const missing = fields.filter(field => !data[field] || (typeof data[field] === 'string' && data[field].trim() === ''))
   
   if (missing.length > 0) {
     throw new APIError(`Missing required fields: ${missing.join(', ')}`, 400)

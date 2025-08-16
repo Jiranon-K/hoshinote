@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       ).end(buffer)
     })
 
-    const result = uploadResponse as any
+    const result = uploadResponse as { secure_url: string; public_id: string; [key: string]: unknown }
 
     return NextResponse.json({
       url: result.secure_url,

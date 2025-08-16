@@ -16,7 +16,7 @@ type CommentFormInput = z.infer<typeof commentFormSchema>
 interface CommentFormProps {
   postId: string
   parentCommentId?: string
-  onCommentAdded: (comment: any) => void
+  onCommentAdded: (comment: { _id: string; content: string; author: { name: string; avatar?: string }; createdAt: string; updatedAt: string; post: string; status: string }) => void
   onCancel?: () => void
   placeholder?: string
   buttonText?: string

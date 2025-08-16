@@ -6,6 +6,7 @@ import User from '@/models/User'
 import Post from '@/models/Post'
 import Comment from '@/models/Comment'
 import { handleAPIError, APIError, validateRequiredFields, sanitizeInput } from '@/lib/api-helpers'
+import { logActivity, generateActivityDescription } from '@/lib/activity-logger'
 
 export async function GET() {
   try {
@@ -116,6 +117,14 @@ export async function PUT(request: NextRequest) {
       postsCount,
       commentsCount
     }
+
+    // Log activity
+    await logActivity({
+      userId: session.user.id,
+      type: 'profile_updated',
+      description: generateActivityDescription('profile_updated'),
+      metadata: {}
+    })
 
     return NextResponse.json({ 
       message: 'Profile updated successfully',

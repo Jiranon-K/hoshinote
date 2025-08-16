@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import StatsCard from '@/components/dashboard/StatsCard'
+import RecentActivity from '@/components/dashboard/RecentActivity'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -67,7 +68,7 @@ export default function DashboardPage() {
             Welcome back, {session?.user.name}!
           </h1>
           <p className="text-gray-600">
-            Here's what's happening with your {isAdmin ? 'platform' : 'blog'}.
+            Here&apos;s what&apos;s happening with your {isAdmin ? 'platform' : 'blog'}.
           </p>
         </div>
         <Link href="/dashboard/posts/new" className="cursor-pointer">
@@ -170,15 +171,7 @@ export default function DashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center space-x-4">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Welcome to Hoshi-Note!</p>
-                  <p className="text-xs text-gray-500">Get started by creating your first post</p>
-                </div>
-              </div>
-            </div>
+            <RecentActivity />
           </CardContent>
         </Card>
       </div>

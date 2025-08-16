@@ -5,6 +5,7 @@ import dbConnect from '@/lib/database'
 import { Post } from '@/models'
 import { postSchema } from '@/lib/validations'
 import { Types } from 'mongoose'
+import { logActivity, generateActivityDescription } from '@/lib/activity-logger'
 
 interface RouteParams {
   params: Promise<{
@@ -109,11 +110,33 @@ export async function PUT(
       }
     }
     
+    const oldStatus = post.status
     const updatedPost = await Post.findByIdAndUpdate(
       id,
       validatedData,
       { new: true }
     ).populate('author', 'name email avatar')
+    
+    // Log activity
+    const isStatusChange = oldStatus !== validatedData.status
+    const activityType = isStatusChange && validatedData.status === 'published' ? 'post_published' : 'post_updated'
+    
+    await logActivity({
+      userId: session.user.id,
+      type: activityType,
+      description: generateActivityDescription(activityType, {
+        postTitle: updatedPost.title,
+        postId: updatedPost._id.toString(),
+        oldStatus,
+        newStatus: validatedData.status
+      }),
+      metadata: {
+        postId: updatedPost._id.toString(),
+        postTitle: updatedPost.title,
+        oldStatus,
+        newStatus: validatedData.status
+      }
+    })
     
     return NextResponse.json(updatedPost)
   } catch (error) {
@@ -173,6 +196,20 @@ export async function DELETE(
         { status: 403 }
       )
     }
+    
+    // Log activity before deletion
+    await logActivity({
+      userId: session.user.id,
+      type: 'post_deleted',
+      description: generateActivityDescription('post_deleted', {
+        postTitle: post.title,
+        postId: post._id.toString()
+      }),
+      metadata: {
+        postId: post._id.toString(),
+        postTitle: post.title
+      }
+    })
     
     await Post.findByIdAndDelete(id)
     

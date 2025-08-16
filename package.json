@@ -10,6 +10,7 @@
     "lint:fix": "next lint --fix",
     "type-check": "tsc --noEmit",
     "seed": "node scripts/seed.js",
+    "seed:activities": "node scripts/seed-activities.js",
     "migrate-editorjs": "node scripts/migrate-to-editorjs.js",
     "clean": "rimraf .next",
     "build:analyze": "ANALYZE=true next build",

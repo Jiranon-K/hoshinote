@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     const userId = session.user.id
     const isAdmin = session.user.role === 'admin'
     
-    const filter: any = isAdmin ? {} : { author: userId }
+    const filter: Record<string, unknown> = isAdmin ? {} : { author: userId }
     
     if (status && status !== 'all') {
       filter.status = status

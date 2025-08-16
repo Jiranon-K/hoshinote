@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth'
 import dbConnect from '@/lib/database'
 import { Post } from '@/models'
 import { postSchema } from '@/lib/validations'
+import { logActivity, generateActivityDescription } from '@/lib/activity-logger'
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,7 +20,7 @@ export async function GET(request: NextRequest) {
     
     const skip = (page - 1) * limit
     
-    const filter: any = { status }
+    const filter: Record<string, unknown> = { status }
     
     if (category) {
       filter.categories = { $in: [category] }
@@ -94,6 +95,20 @@ export async function POST(request: NextRequest) {
     })
     
     await post.populate('author', 'name email avatar')
+    
+    // Log activity
+    await logActivity({
+      userId: session.user.id,
+      type: 'post_created',
+      description: generateActivityDescription('post_created', {
+        postTitle: post.title,
+        postId: post._id.toString()
+      }),
+      metadata: {
+        postId: post._id.toString(),
+        postTitle: post.title
+      }
+    })
     
     return NextResponse.json(post, { status: 201 })
   } catch (error) {

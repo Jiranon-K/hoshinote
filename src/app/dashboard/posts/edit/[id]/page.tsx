@@ -22,7 +22,7 @@ async function getPost(id: string, userId: string, userRole: string) {
       return null
     }
 
-    const postData = post as any
+    const postData = post as unknown as { _id: { toString(): string }; title: string; slug: string; content: string; excerpt: string; coverImage?: string; tags: string[]; categories: string[]; status: 'draft' | 'published' | 'archived' }
 
     return {
       _id: postData._id.toString(),

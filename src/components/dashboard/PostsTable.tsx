@@ -300,7 +300,7 @@ export default function PostsTable({ posts, onPostDeleted }: PostsTableProps) {
                             <AlertDialogHeader>
                               <AlertDialogTitle>Delete Post</AlertDialogTitle>
                               <AlertDialogDescription>
-                                Are you sure you want to delete "<strong>{post.title}</strong>"? This action cannot be undone.
+                                Are you sure you want to delete &quot;<strong>{post.title}</strong>&quot;? This action cannot be undone.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
