@@ -146,6 +146,7 @@ export default function Header() {
                             src={session.user.avatar}
                             alt={session.user.name || 'User'}
                             className="h-full w-full object-cover object-center"
+                            key={session.user.avatar}
                           />
                         ) : (
                           <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
@@ -197,6 +198,7 @@ export default function Header() {
                           src={session.user.avatar}
                           alt={session.user.name || 'User'}
                           className="h-full w-full object-cover object-center transition-transform duration-200 hover:scale-105"
+                          key={session.user.avatar}
                         />
                       ) : (
                         <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 transition-all duration-200 hover:from-blue-400 hover:to-purple-500">

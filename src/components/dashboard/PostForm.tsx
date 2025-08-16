@@ -274,7 +274,7 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
 
                   <div className="text-sm text-gray-500 space-y-1">
                     <p>💡 Upload images directly or use external URLs</p>
-                    <p>📸 Images are automatically optimized via Cloudinary</p>
+                    <p>📸 Images are automatically optimized via Cloudflare R2</p>
                   </div>
                 </div>
               </div>

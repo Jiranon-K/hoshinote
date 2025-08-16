@@ -11,7 +11,7 @@ interface AppShellProps {
 
 export default function AppShell({ children }: AppShellProps) {
   const pathname = usePathname()
-  const hideChrome = pathname.startsWith('/auth/') || pathname.startsWith('/dashboard/')
+  const hideChrome = pathname.startsWith('/auth/') || pathname.startsWith('/dashboard/') || pathname === '/'
 
   if (hideChrome) {
     return <>{children}</>

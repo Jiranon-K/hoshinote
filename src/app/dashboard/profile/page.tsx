@@ -156,29 +156,55 @@ export default function ProfilePage() {
       if (response.ok) {
         setValue('avatar', result.url)
         
-        // Update local profile state first
-        if (profile) {
-          setProfile({
-            ...profile,
-            avatar: result.url
+     
+        const updatedProfile = {
+          ...profile!,
+          avatar: result.url
+        }
+        setProfile(updatedProfile)
+        
+       
+        try {
+          const saveResponse = await fetch('/api/user/profile', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              name: profile?.name,
+              email: profile?.email,
+              bio: profile?.bio,
+              avatar: result.url,
+              oldAvatar: profile?.avatar
+            })
+          })
+          
+          if (saveResponse.ok) {
+            const savedProfile = await saveResponse.json()
+            setProfile(savedProfile.user)
+
+            await update({
+              name: savedProfile.user.name,
+              email: savedProfile.user.email,
+              avatar: savedProfile.user.avatar
+            })
+            
+            toast({
+              type: 'success',
+              title: 'Profile picture updated!',
+              description: 'Your avatar has been saved successfully.'
+            })
+          } else {
+            throw new Error('Failed to save profile')
+          }
+        } catch (saveError) {
+          console.error('Error saving profile:', saveError)
+          toast({
+            type: 'warning',
+            title: 'Image uploaded but not saved',
+            description: 'Please save your profile to persist the changes.'
           })
         }
-        
-        // Update session immediately with new avatar
-        await update({
-          name: profile?.name,
-          email: profile?.email,
-          avatar: result.url
-        })
-        
-        // Force page reload to update all components with new avatar
-        window.location.reload()
-        
-        toast({
-          type: 'success',
-          title: 'Image uploaded!',
-          description: 'Your profile picture has been updated.'
-        })
       } else {
         toast({
           type: 'error',
@@ -225,21 +251,26 @@ export default function ProfilePage() {
         setProfile(updatedProfile.user)
         setEditing(false)
         
+        // Reset form with updated data
+        reset({
+          name: updatedProfile.user.name,
+          email: updatedProfile.user.email,
+          bio: updatedProfile.user.bio || '',
+          avatar: updatedProfile.user.avatar || ''
+        })
+        
         toast({
           type: 'success',
           title: 'Profile updated!',
           description: 'Your profile has been successfully updated.'
         })
         
-        // Force session update with all current user data
+        // Update session with all current user data
         await update({
           name: updatedProfile.user.name,
           email: updatedProfile.user.email,
           avatar: updatedProfile.user.avatar
         })
-        
-        // Force page reload to update all components with new profile data
-        window.location.reload()
       } else {
         const errorData = await response.json()
         toast({
@@ -356,9 +387,9 @@ export default function ProfilePage() {
                     className={`relative h-24 w-24 rounded-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 ring-4 ring-white shadow-xl ${editing ? 'cursor-pointer' : ''}`}
                     onClick={editing ? () => fileInputRef.current?.click() : undefined}
                   >
-                    {(editing ? watchedAvatar : profile.avatar) ? (
+                    {profile.avatar ? (
                       <img
-                        src={editing ? watchedAvatar : profile.avatar}
+                        src={profile.avatar}
                         alt={profile.name}
                         className="h-full w-full object-cover object-center transition-transform group-hover:scale-105"
                         onError={(e) => {
@@ -373,6 +404,7 @@ export default function ProfilePage() {
                             `;
                           }
                         }}
+                        key={profile.avatar}
                       />
                     ) : (
                       <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
