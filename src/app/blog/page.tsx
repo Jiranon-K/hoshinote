@@ -1,20 +1,42 @@
 import PostList from '@/components/blog/PostList'
+import dbConnect from '@/lib/database'
+import { Post } from '@/models'
 
 async function getPosts() {
   try {
-    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
-    const response = await fetch(`${baseUrl}/api/posts?limit=9`, {
-      cache: 'no-store'
+    await dbConnect()
+    
+    const posts = await Post.find({ status: 'published' })
+      .populate('author', 'name email avatar')
+      .sort({ publishedAt: -1, createdAt: -1 })
+      .limit(9)
+      .lean()
+     
+    const serializedPosts = posts.map(post => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const typedPost = post as any
+      return {
+        ...typedPost,
+        _id: String(typedPost._id),
+        author: {
+          ...typedPost.author,
+          _id: String(typedPost.author._id)
+        }
+      }
     })
     
-    if (!response.ok) {
-      throw new Error('Failed to fetch posts')
+    return { 
+      posts: serializedPosts, 
+      pagination: {
+        page: 1,
+        limit: 9,
+        total: serializedPosts.length,
+        pages: 1
+      }
     }
-    
-    return await response.json()
   } catch (error) {
     console.error('Error fetching posts:', error)
-    return { posts: [], pagination: null }
+    return { posts: [], pagination: undefined }
   }
 }
 
@@ -33,10 +55,21 @@ export default async function BlogPage() {
           </p>
         </div>
 
-        <PostList 
-          initialPosts={data.posts} 
-          initialPagination={data.pagination}
-        />
+        {data.posts.length === 0 ? (
+          <div className="text-center py-12">
+            <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+              No posts found
+            </h2>
+            <p className="text-gray-500">
+              Check back later for new content!
+            </p>
+          </div>
+        ) : (
+          <PostList 
+            initialPosts={data.posts} 
+            initialPagination={data.pagination}
+          />
+        )}
       </div>
     </div>
   )
