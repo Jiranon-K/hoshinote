@@ -200,7 +200,7 @@ export default function ProfilePage() {
         } catch (saveError) {
           console.error('Error saving profile:', saveError)
           toast({
-            type: 'warning',
+            type: 'info',
             title: 'Image uploaded but not saved',
             description: 'Please save your profile to persist the changes.'
           })
