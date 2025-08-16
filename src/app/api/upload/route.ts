@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { v2 as cloudinary } from 'cloudinary'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-})
+import { uploadToR2, deleteFromR2 } from '@/lib/r2'
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,48 +30,18 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
 
-    const uploadResponse = await new Promise((resolve, reject) => {
-      cloudinary.uploader.upload_stream(
-        {
-          resource_type: 'image',
-          folder: 'hoshi-note',
-          transformation: [
-            { width: 800, height: 800, crop: 'fill', gravity: 'face:center', quality: 'auto:good' },
-            { fetch_format: 'auto' }
-          ]
-        },
-        (error, result) => {
-          if (error) reject(error)
-          else resolve(result)
-        }
-      ).end(buffer)
-    })
+    const uploadUrl = await uploadToR2(buffer, file.name, file.type)
 
-    const result = uploadResponse as { secure_url: string; public_id: string; [key: string]: unknown }
-
-  
-    if (oldImageUrl && oldImageUrl.includes('cloudinary.com')) {
+    if (oldImageUrl && oldImageUrl.includes(process.env.R2_PUBLIC_URL!)) {
       try {
-        const urlParts = oldImageUrl.split('/')
-        const publicIdWithExt = urlParts[urlParts.length - 1]
-        const publicId = publicIdWithExt.split('.')[0]
-        
-     
-        const folderIndex = urlParts.findIndex(part => part === 'hoshi-note')
-        if (folderIndex !== -1) {
-          const fullPublicId = urlParts.slice(folderIndex).join('/').split('.')[0]
-          await cloudinary.uploader.destroy(fullPublicId)
-        }
+        await deleteFromR2(oldImageUrl)
       } catch (deleteError) {
         console.warn('Failed to delete old image:', deleteError)
       }
     }
 
     return NextResponse.json({
-      url: result.secure_url,
-      publicId: result.public_id,
-      width: result.width,
-      height: result.height
+      url: uploadUrl,
     })
   } catch (error) {
     console.error('Upload error:', error)

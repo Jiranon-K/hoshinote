@@ -1,7 +1,11 @@
+'use client'
+
 import { Badge } from '@/components/ui/badge'
 import CommentSection from './CommentSection'
 import { formatSafeDate } from '@/lib/date-utils'
 import TipTapRenderer from '@/components/editor/TipTapRenderer'
+import Image from 'next/image'
+import { useState } from 'react'
 
 interface PostDetailProps {
   post: {
@@ -26,14 +30,18 @@ interface PostDetailProps {
 
 
 export default function PostDetail({ post }: PostDetailProps) {
+  const [avatarError, setAvatarError] = useState(false)
+
   return (
     <article className="max-w-4xl mx-auto">
       {post.coverImage && (
         <div className="relative h-96 overflow-hidden rounded-lg mb-8">
-          <img
+          <Image
             src={post.coverImage}
             alt={post.title}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
           />
         </div>
       )}
@@ -57,12 +65,15 @@ export default function PostDetail({ post }: PostDetailProps) {
 
         <div className="flex items-center justify-between border-t border-b border-gray-200 py-4">
           <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
-              {post.author.avatar ? (
-                <img
+            <div className="relative w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
+              {post.author.avatar && !avatarError ? (
+                <Image
                   src={post.author.avatar}
                   alt={post.author.name}
+                  width={40}
+                  height={40}
                   className="w-full h-full rounded-full object-cover"
+                  onError={() => setAvatarError(true)}
                 />
               ) : (
                 <span className="text-sm font-medium text-gray-600">

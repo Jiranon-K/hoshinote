@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -29,6 +31,7 @@ interface PostCardProps {
 export default function PostCard({ post }: PostCardProps) {
   const [imageError, setImageError] = useState(false)
   const [imageLoading, setImageLoading] = useState(true)
+  const [avatarError, setAvatarError] = useState(false)
 
   return (
     <Card className="h-full hover:shadow-xl transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] group cursor-pointer border hover:border-primary/20">
@@ -69,7 +72,23 @@ export default function PostCard({ post }: PostCardProps) {
       )}
       <CardHeader>
         <div className="flex items-center justify-between text-sm text-gray-500 mb-2">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3">
+            {post.author.avatar && !avatarError ? (
+              <Image
+                src={post.author.avatar}
+                alt={post.author.name}
+                width={24}
+                height={24}
+                className="rounded-full object-cover"
+                onError={() => setAvatarError(true)}
+              />
+            ) : (
+              <div className="w-6 h-6 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
+                <span className="text-white text-xs font-bold">
+                  {post.author.name.charAt(0).toUpperCase()}
+                </span>
+              </div>
+            )}
             <span>{post.author.name}</span>
           </div>
           <time dateTime={post.publishedAt || post.createdAt}>

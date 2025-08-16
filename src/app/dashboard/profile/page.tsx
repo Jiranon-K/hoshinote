@@ -171,8 +171,8 @@ export default function ProfilePage() {
           avatar: result.url
         })
         
-        // Small delay to ensure session propagates
-        await new Promise(resolve => setTimeout(resolve, 100))
+        // Force page reload to update all components with new avatar
+        window.location.reload()
         
         toast({
           type: 'success',
@@ -238,8 +238,8 @@ export default function ProfilePage() {
           avatar: updatedProfile.user.avatar
         })
         
-        // Force a small delay to ensure session update propagates
-        await new Promise(resolve => setTimeout(resolve, 100))
+        // Force page reload to update all components with new profile data
+        window.location.reload()
       } else {
         const errorData = await response.json()
         toast({
