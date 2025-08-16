@@ -18,6 +18,7 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData()
     const file = formData.get('file') as File
+    const oldImageUrl = formData.get('oldImageUrl') as string
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
@@ -53,6 +54,24 @@ export async function POST(request: NextRequest) {
     })
 
     const result = uploadResponse as { secure_url: string; public_id: string; [key: string]: unknown }
+
+  
+    if (oldImageUrl && oldImageUrl.includes('cloudinary.com')) {
+      try {
+        const urlParts = oldImageUrl.split('/')
+        const publicIdWithExt = urlParts[urlParts.length - 1]
+        const publicId = publicIdWithExt.split('.')[0]
+        
+     
+        const folderIndex = urlParts.findIndex(part => part === 'hoshi-note')
+        if (folderIndex !== -1) {
+          const fullPublicId = urlParts.slice(folderIndex).join('/').split('.')[0]
+          await cloudinary.uploader.destroy(fullPublicId)
+        }
+      } catch (deleteError) {
+        console.warn('Failed to delete old image:', deleteError)
+      }
+    }
 
     return NextResponse.json({
       url: result.secure_url,

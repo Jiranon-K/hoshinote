@@ -7,6 +7,13 @@ import Post from '@/models/Post'
 import Comment from '@/models/Comment'
 import { handleAPIError, APIError, validateRequiredFields, sanitizeInput } from '@/lib/api-helpers'
 import { logActivity, generateActivityDescription } from '@/lib/activity-logger'
+import { v2 as cloudinary } from 'cloudinary'
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+})
 
 export async function GET() {
   try {
@@ -48,7 +55,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { name, email, bio, avatar } = body
+    const { name, email, bio, avatar, oldAvatar } = body
 
     // Validate required fields
     validateRequiredFields(body, ['name', 'email'])
@@ -86,6 +93,24 @@ export async function PUT(request: NextRequest) {
     
     if (existingUser) {
       throw new APIError('Email already in use', 409)
+    }
+
+ 
+    if (oldAvatar && sanitizedData.avatar && oldAvatar !== sanitizedData.avatar && oldAvatar.includes('cloudinary.com')) {
+      try {
+        const urlParts = oldAvatar.split('/')
+        const publicIdWithExt = urlParts[urlParts.length - 1]
+        const publicId = publicIdWithExt.split('.')[0]
+        
+
+        const folderIndex = urlParts.findIndex(part => part === 'hoshi-note')
+        if (folderIndex !== -1) {
+          const fullPublicId = urlParts.slice(folderIndex).join('/').split('.')[0]
+          await cloudinary.uploader.destroy(fullPublicId)
+        }
+      } catch (deleteError) {
+        console.warn('Failed to delete old avatar:', deleteError)
+      }
     }
 
     const updatedUser = await User.findByIdAndUpdate(

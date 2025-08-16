@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -13,7 +13,6 @@ import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useToast } from '@/components/ui/toaster'
-import ImageUpload from '@/components/ui/image-upload'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -62,6 +61,8 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
   const [updating, setUpdating] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const {
     register,
@@ -116,6 +117,94 @@ export default function ProfilePage() {
     fetchProfile()
   }, [status, router, fetchProfile])
 
+  const handleFileSelect = async (file: File) => {
+    if (!file) return
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        type: 'error',
+        title: 'File too large',
+        description: 'Maximum file size is 10MB.'
+      })
+      return
+    }
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+    if (!allowedTypes.includes(file.type)) {
+      toast({
+        type: 'error',
+        title: 'Invalid file type',
+        description: 'Only JPEG, PNG, WebP, and GIF are allowed.'
+      })
+      return
+    }
+
+    setUploading(true)
+    
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('oldImageUrl', profile?.avatar || '')
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const result = await response.json()
+
+      if (response.ok) {
+        setValue('avatar', result.url)
+        
+        // Update local profile state first
+        if (profile) {
+          setProfile({
+            ...profile,
+            avatar: result.url
+          })
+        }
+        
+        // Update session immediately with new avatar
+        await update({
+          name: profile?.name,
+          email: profile?.email,
+          avatar: result.url
+        })
+        
+        // Small delay to ensure session propagates
+        await new Promise(resolve => setTimeout(resolve, 100))
+        
+        toast({
+          type: 'success',
+          title: 'Image uploaded!',
+          description: 'Your profile picture has been updated.'
+        })
+      } else {
+        toast({
+          type: 'error',
+          title: 'Upload failed',
+          description: result.error || 'Failed to upload image.'
+        })
+      }
+    } catch (error) {
+      console.error('Upload error:', error)
+      toast({
+        type: 'error',
+        title: 'Upload error',
+        description: 'Please check your connection and try again.'
+      })
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      handleFileSelect(file)
+    }
+  }
+
   const onSubmit = async (data: ProfileFormData) => {
     setUpdating(true)
     
@@ -125,7 +214,10 @@ export default function ProfilePage() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify({
+          ...data,
+          oldAvatar: profile?.avatar
+        })
       })
 
       if (response.ok) {
@@ -139,12 +231,15 @@ export default function ProfilePage() {
           description: 'Your profile has been successfully updated.'
         })
         
-        // Update session with new data
+        // Force session update with all current user data
         await update({
-          name: data.name,
-          email: data.email,
-          avatar: data.avatar
+          name: updatedProfile.user.name,
+          email: updatedProfile.user.email,
+          avatar: updatedProfile.user.avatar
         })
+        
+        // Force a small delay to ensure session update propagates
+        await new Promise(resolve => setTimeout(resolve, 100))
       } else {
         const errorData = await response.json()
         toast({
@@ -257,14 +352,16 @@ export default function ProfilePage() {
               <div className="flex flex-col items-center space-y-4">
                 {/* Avatar Section */}
                 <div className="relative group">
-                  <div className="relative h-24 w-24 rounded-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 ring-4 ring-white shadow-xl">
+                  <div 
+                    className={`relative h-24 w-24 rounded-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 ring-4 ring-white shadow-xl ${editing ? 'cursor-pointer' : ''}`}
+                    onClick={editing ? () => fileInputRef.current?.click() : undefined}
+                  >
                     {(editing ? watchedAvatar : profile.avatar) ? (
                       <img
                         src={editing ? watchedAvatar : profile.avatar}
                         alt={profile.name}
                         className="h-full w-full object-cover object-center transition-transform group-hover:scale-105"
                         onError={(e) => {
-                          // Fallback to initials if image fails to load
                           const target = e.target as HTMLImageElement;
                           target.style.display = 'none';
                           const parent = target.parentElement;
@@ -285,10 +382,16 @@ export default function ProfilePage() {
                       </div>
                     )}
                     {editing && (
-                      <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 cursor-pointer backdrop-blur-sm">
+                      <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm">
                         <div className="text-center">
-                          <Camera className="h-6 w-6 text-white mx-auto mb-1" />
-                          <span className="text-xs text-white font-medium">Change</span>
+                          {uploading ? (
+                            <Loader2 className="h-6 w-6 text-white mx-auto mb-1 animate-spin" />
+                          ) : (
+                            <Camera className="h-6 w-6 text-white mx-auto mb-1" />
+                          )}
+                          <span className="text-xs text-white font-medium">
+                            {uploading ? 'Uploading...' : 'Change'}
+                          </span>
                         </div>
                       </div>
                     )}
@@ -336,6 +439,15 @@ export default function ProfilePage() {
           </Card>
         </div>
 
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileInputChange}
+          className="hidden"
+        />
+
         {/* Profile Form Card */}
         <div className="lg:col-span-2">
           <Card>
@@ -347,18 +459,6 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent>
               <form id="profile-form" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                {/* Avatar Upload */}
-                {editing && (
-                  <div className="space-y-4">
-                    <Label className="text-base font-medium">Profile Picture</Label>
-                    <ImageUpload
-                      currentImage={watchedAvatar || ''}
-                      onUpload={(url: string) => setValue('avatar', url)}
-                      onRemove={() => setValue('avatar', '')}
-                      label="Upload or change your profile picture"
-                    />
-                  </div>
-                )}
 
                 {/* Name and Email */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
