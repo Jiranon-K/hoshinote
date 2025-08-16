@@ -298,3 +298,54 @@
   height: 100%;
   border-radius: 0.5rem;
 }
+
+/* Thai Font Styles for Post Content */
+.thai-content {
+  font-family: 'Noto Sans Thai', var(--font-nunito), sans-serif;
+  line-height: 1.8;
+  letter-spacing: 0.01em;
+}
+
+.thai-content h1, 
+.thai-content h2, 
+.thai-content h3, 
+.thai-content h4, 
+.thai-content h5, 
+.thai-content h6 {
+  font-family: 'Noto Sans Thai', var(--font-nunito), sans-serif;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.thai-content p {
+  font-family: 'Noto Sans Thai', var(--font-nunito), sans-serif;
+  line-height: 1.8;
+  margin-bottom: 1rem;
+}
+
+.thai-content blockquote {
+  font-family: 'Noto Sans Thai', var(--font-nunito), sans-serif;
+  line-height: 1.7;
+}
+
+.thai-content ul li,
+.thai-content ol li {
+  font-family: 'Noto Sans Thai', var(--font-nunito), sans-serif;
+  line-height: 1.8;
+  margin-bottom: 0.5rem;
+}
+
+/* Post Title Thai Font */
+.post-title-thai {
+  font-family: 'Noto Sans Thai', var(--font-nunito), sans-serif;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+/* Post Excerpt Thai Font */
+.post-excerpt-thai {
+  font-family: 'Noto Sans Thai', var(--font-nunito), sans-serif;
+  line-height: 1.7;
+  font-weight: 400;
+}

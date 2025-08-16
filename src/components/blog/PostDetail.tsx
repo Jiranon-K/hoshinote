@@ -55,11 +55,11 @@ export default function PostDetail({ post }: PostDetailProps) {
           ))}
         </div>
 
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 post-title-thai">
           {post.title}
         </h1>
 
-        <p className="text-xl text-gray-600 mb-6">
+        <p className="text-xl text-gray-600 mb-6 post-excerpt-thai">
           {post.excerpt}
         </p>
 
@@ -117,7 +117,7 @@ export default function PostDetail({ post }: PostDetailProps) {
       <div className="mb-12">
         <TipTapRenderer 
           content={post.content}
-          className="prose prose-lg prose-slate max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-700 prose-p:leading-8 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 prose-code:text-pink-600 prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-blockquote:border-l-blue-500 prose-blockquote:bg-blue-50 prose-blockquote:py-2 prose-img:rounded-lg prose-img:shadow-md"
+          className="thai-content prose prose-lg prose-slate max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-700 prose-p:leading-8 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 prose-code:text-pink-600 prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-blockquote:border-l-blue-500 prose-blockquote:bg-blue-50 prose-blockquote:py-2 prose-img:rounded-lg prose-img:shadow-md"
         />
       </div>
 

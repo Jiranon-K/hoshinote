@@ -96,13 +96,13 @@ export default function PostCard({ post }: PostCardProps) {
           </time>
         </div>
         <Link href={`/blog/${post.slug}`} className="hover:underline group/title cursor-pointer">
-          <h3 className="text-xl font-semibold text-gray-900 line-clamp-2 group-hover/title:text-primary transition-colors duration-300">
+          <h3 className="post-title-thai text-xl font-semibold text-gray-900 line-clamp-2 group-hover/title:text-primary transition-colors duration-300">
             {post.title}
           </h3>
         </Link>
       </CardHeader>
       <CardContent>
-        <p className="text-gray-600 mb-4 line-clamp-3">
+        <p className="post-excerpt-thai text-gray-600 mb-4 line-clamp-3">
           {post.excerpt}
         </p>
         

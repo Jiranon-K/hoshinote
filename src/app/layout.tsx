@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
-  keywords: ["blog", "nextjs", "typescript", "mongodb", "cms", "publishing"],
+  keywords: ["anime", "anime blog", "gaming", "game reviews", "anime reviews", "otaku", "manga", "light novel", "visual novel", "jrpg", "anime news", "gaming news", "weeb", "kawaii", "moe", "honkai star rail", "genshin impact", "japanese culture", "anime discussion", "game guides", "anime recommendations"],
   authors: [
     {
       name: siteConfig.authors.default,
