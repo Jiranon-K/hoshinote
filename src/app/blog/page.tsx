@@ -1,6 +1,28 @@
 import PostList from '@/components/blog/PostList'
 import dbConnect from '@/lib/database'
 import { Post } from '@/models'
+import { Types } from 'mongoose'
+
+interface PostWithAuthor {
+  _id: Types.ObjectId
+  title: string
+  slug: string
+  excerpt: string
+  coverImage?: string
+  author: {
+    _id: Types.ObjectId
+    name: string
+    email: string
+    avatar?: string
+  }
+  tags: string[]
+  categories: string[]
+  status: string
+  publishedAt?: Date
+  views: number
+  likes: number
+  createdAt: Date
+}
 
 async function getPosts() {
   try {
@@ -13,11 +35,12 @@ async function getPosts() {
       .lean()
      
     const serializedPosts = posts.map(post => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const typedPost = post as any
+      const typedPost = post as unknown as PostWithAuthor
       return {
         ...typedPost,
         _id: String(typedPost._id),
+        publishedAt: typedPost.publishedAt?.toISOString(),
+        createdAt: typedPost.createdAt.toISOString(),
         author: {
           ...typedPost.author,
           _id: String(typedPost.author._id)

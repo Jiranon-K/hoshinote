@@ -1,5 +1,31 @@
 import { notFound } from 'next/navigation'
 import PostDetail from '@/components/blog/PostDetail'
+import dbConnect from '@/lib/database'
+import { Post } from '@/models'
+import { Types } from 'mongoose'
+
+interface PostWithAuthor {
+  _id: Types.ObjectId
+  title: string
+  slug: string
+  content: string
+  excerpt: string
+  coverImage?: string
+  author: {
+    _id: Types.ObjectId
+    name: string
+    email: string
+    avatar?: string
+  }
+  tags: string[]
+  categories: string[]
+  status: string
+  publishedAt?: Date
+  views: number
+  likes: number
+  createdAt: Date
+  updatedAt: Date
+}
 
 interface PageProps {
   params: Promise<{
@@ -9,19 +35,37 @@ interface PageProps {
 
 async function getPost(slug: string) {
   try {
-    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
-    const response = await fetch(`${baseUrl}/api/posts/slug/${slug}`, {
-      cache: 'no-store'
-    })
+    await dbConnect()
     
-    if (!response.ok) {
-      if (response.status === 404) {
-        return null
+    const post = await Post.findOne({ 
+      slug, 
+      status: 'published' 
+    })
+      .populate('author', 'name email avatar')
+      .lean()
+    
+    if (!post) {
+      return null
+    }
+
+    const typedPost = post as unknown as PostWithAuthor
+    const serializedPost = {
+      ...typedPost,
+      _id: String(typedPost._id),
+      publishedAt: typedPost.publishedAt?.toISOString(),
+      createdAt: typedPost.createdAt.toISOString(),
+      updatedAt: typedPost.updatedAt.toISOString(),
+      author: {
+        ...typedPost.author,
+        _id: String(typedPost.author._id)
       }
-      throw new Error('Failed to fetch post')
     }
     
-    return await response.json()
+    await Post.findByIdAndUpdate(typedPost._id, { 
+      $inc: { views: 1 } 
+    })
+    
+    return serializedPost
   } catch (error) {
     console.error('Error fetching post:', error)
     return null
