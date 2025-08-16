@@ -75,7 +75,6 @@ class Logger {
     this.info(message, ...args)
   }
 
-  // Group logging for better organization
   group(label: string): void {
     if (this.config.enabled) {
       console.group(label)
@@ -88,14 +87,12 @@ class Logger {
     }
   }
 
-  // Table logging for objects/arrays
   table(data: unknown): void {
     if (this.config.enabled && this.shouldLog('info')) {
       console.table(data)
     }
   }
 
-  // Time logging for performance
   time(label: string): void {
     if (this.config.enabled && this.shouldLog('debug')) {
       console.time(label)
@@ -109,11 +106,8 @@ class Logger {
   }
 }
 
-// Create singleton instance
 export const logger = new Logger()
 
-// Export individual methods for convenient imports
 export const { debug, info, warn, error, log, group, groupEnd, table, time, timeEnd } = logger
 
-// Export default
 export default logger

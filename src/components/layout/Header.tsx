@@ -27,15 +27,12 @@ import {
 } from '@/components/ui/sheet'
 import { Menu, LogOut, User as UserIcon, LayoutDashboard, PenSquare, FileText } from 'lucide-react'
 
-// Using shadcn + lucide Menu icon instead of custom spans
-
 export default function Header() {
   const { data: session, status } = useSession()
   const pathname = usePathname()
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
 
-  // Scroll shrink effect
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10)
     onScroll()
@@ -43,7 +40,6 @@ export default function Header() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Close sheet on route change
   useEffect(() => { setOpen(false) }, [pathname])
 
   const navLinks = [
@@ -60,7 +56,6 @@ export default function Header() {
     >
       <div className="mx-auto w-full max-w-7xl px-4 md:px-6">
         <div className="flex h-16 items-center justify-between gap-4">
-          {/* Left: Brand + Desktop Nav */}
           <div className="flex items-center gap-6">
             <Link
               href="/"
@@ -98,9 +93,6 @@ export default function Header() {
             </nav>
           </div>
 
-          {/* (Search bar removed) */}
-
-          {/* Right: Auth / User */}
           <div className="flex items-center gap-2">
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
@@ -253,7 +245,6 @@ export default function Header() {
           </div>
         </div>
       </div>
-      {/* Mobile nav handled by Sheet */}
     </header>
   )
 }

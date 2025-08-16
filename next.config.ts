@@ -1,15 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Enable experimental features
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
   
-  // Image optimization
   images: {
     formats: ['image/webp', 'image/avif'],
-    minimumCacheTTL: 31536000, // 1 year
+  minimumCacheTTL: 31536000,
     remotePatterns: [
       {
         protocol: 'https',
@@ -17,10 +15,15 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: '**.r2.dev',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
   
-  // Security headers
   async headers() {
     return [
       {
@@ -47,7 +50,6 @@ const nextConfig: NextConfig = {
     ]
   },
   
-  // Redirects for better UX
   async redirects() {
     return [
       {
@@ -58,18 +60,14 @@ const nextConfig: NextConfig = {
     ]
   },
   
-  // Compress responses
   compress: true,
   
-  // PoweredBy header removal
   poweredByHeader: false,
   
-  // Enable TypeScript strict mode
   typescript: {
     ignoreBuildErrors: false,
   },
   
-  // ESLint configuration
   eslint: {
     ignoreDuringBuilds: false,
   },

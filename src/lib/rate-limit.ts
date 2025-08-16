@@ -9,7 +9,7 @@ export function rateLimit(
   identifier: string,
   options: RateLimitOptions = {}
 ): { success: boolean; remaining: number; resetTime: number } {
-  const { maxAttempts = 5, windowMs = 15 * 60 * 1000 } = options // 5 attempts per 15 minutes
+  const { maxAttempts = 5, windowMs = 15 * 60 * 1000 } = options 
   const now = Date.now()
   
   const record = rateLimitMap.get(identifier)
@@ -34,7 +34,7 @@ export function clearRateLimit(identifier: string): void {
   rateLimitMap.delete(identifier)
 }
 
-// Cleanup old entries periodically
+
 setInterval(() => {
   const now = Date.now()
   for (const [key, record] of rateLimitMap.entries()) {
@@ -42,4 +42,4 @@ setInterval(() => {
       rateLimitMap.delete(key)
     }
   }
-}, 60 * 1000) // Clean up every minute
+}, 60 * 1000) 

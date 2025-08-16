@@ -21,7 +21,6 @@ export function handleAPIError(error: unknown) {
   }
   
   if (error instanceof Error) {
-    // Mongoose validation errors
     if (error.name === 'ValidationError') {
       return NextResponse.json(
         { error: 'Validation failed', details: error.message },
@@ -29,7 +28,6 @@ export function handleAPIError(error: unknown) {
       )
     }
     
-    // MongoDB duplicate key error
     if ('code' in error && error.code === 11000) {
       return NextResponse.json(
         { error: 'Resource already exists' },
@@ -37,7 +35,6 @@ export function handleAPIError(error: unknown) {
       )
     }
     
-    // Database connection errors
     if (error.message.includes('connect')) {
       return NextResponse.json(
         { error: 'Database connection failed' },
@@ -46,7 +43,6 @@ export function handleAPIError(error: unknown) {
     }
   }
   
-  // Generic server error
   return NextResponse.json(
     { error: 'Internal server error' },
     { status: 500 }
@@ -67,7 +63,7 @@ export function sanitizeInput(input: string, maxLength: number = 1000): string {
   return input
     .trim()
     .slice(0, maxLength)
-    .replace(/[<>]/g, '') // Basic XSS protection
+  .replace(/[<>]/g, '')
 }
 
 export function validateEmail(email: string): boolean {
