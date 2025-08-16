@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { commentSchema, type CommentInput } from '@/lib/validations'
 import { z } from 'zod'
 import Link from 'next/link'
@@ -99,20 +100,18 @@ export default function CommentForm({
   return (
     <div className="space-y-4">
       <div className="flex items-center space-x-3">
-        <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-200 cursor-pointer">
-          {session.user.avatar ? (
-            <img
-              src={session.user.avatar}
-              alt={session.user.name}
-              className="w-full h-full rounded-full object-cover transition-transform duration-200 hover:scale-105"
-            />
-          ) : (
-            <span className="text-sm font-medium text-gray-600">
-              {session.user.name?.charAt(0).toUpperCase()}
-            </span>
-          )}
-        </div>
-        <span className="font-medium text-gray-900 hover:text-primary transition-colors duration-200 cursor-pointer">{session.user.name}</span>
+        <Avatar className="w-8 h-8 hover:scale-110 transition-transform duration-200 cursor-pointer">
+          <AvatarImage 
+            src={session.user.avatar || ''} 
+            alt={session.user.name || 'User'} 
+          />
+          <AvatarFallback className="text-sm font-medium bg-gray-300 text-gray-600">
+            {session.user.name?.charAt(0).toUpperCase() || 'U'}
+          </AvatarFallback>
+        </Avatar>
+        <span className="font-medium text-gray-900 hover:text-primary transition-colors duration-200 cursor-pointer">
+          {session.user.name}
+        </span>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

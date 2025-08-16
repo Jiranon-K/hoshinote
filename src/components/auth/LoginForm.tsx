@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toaster'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { loginSchema, type LoginInput } from '@/lib/validations'
 import Link from 'next/link'
@@ -22,10 +23,17 @@ export default function LoginForm() {
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors }
   } = useForm<LoginInput>({
-    resolver: zodResolver(loginSchema)
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      rememberMe: false
+    }
   })
+
+  const rememberMe = watch('rememberMe')
 
   const onSubmit = async (data: LoginInput) => {
     setIsLoading(true)
@@ -99,6 +107,20 @@ export default function LoginForm() {
             {errors.password && (
               <p className="text-xs text-red-600">{errors.password.message}</p>
             )}
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="rememberMe"
+              checked={rememberMe}
+              onCheckedChange={(checked: boolean) => setValue('rememberMe', !!checked)}
+            />
+            <Label
+              htmlFor="rememberMe"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Remember me
+            </Label>
           </div>
 
           <Button type="submit" className="w-full" disabled={isLoading}>

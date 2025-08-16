@@ -9,6 +9,7 @@ import { useToast } from '@/components/ui/toaster'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { PasswordStrength } from '@/components/ui/password-strength'
 import { registerSchema, type RegisterInput } from '@/lib/validations'
 import Link from 'next/link'
 
@@ -21,10 +22,13 @@ export default function RegisterForm() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors }
   } = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema)
   })
+
+  const password = watch('password') || ''
 
   const onSubmit = async (data: RegisterInput) => {
     setIsLoading(true)
@@ -105,6 +109,9 @@ export default function RegisterForm() {
               />
               {errors.password && (
                 <p className="text-xs text-red-600">{errors.password.message}</p>
+              )}
+              {password && (
+                <PasswordStrength password={password} />
               )}
             </div>
 

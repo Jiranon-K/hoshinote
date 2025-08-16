@@ -103,7 +103,7 @@ export async function PUT(request: NextRequest) {
         const publicId = publicIdWithExt.split('.')[0]
         
 
-        const folderIndex = urlParts.findIndex(part => part === 'hoshi-note')
+        const folderIndex = urlParts.findIndex((part: string) => part === 'hoshi-note')
         if (folderIndex !== -1) {
           const fullPublicId = urlParts.slice(folderIndex).join('/').split('.')[0]
           await cloudinary.uploader.destroy(fullPublicId)

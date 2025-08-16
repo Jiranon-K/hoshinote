@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { logger } from './logger'
 
 const MONGODB_URI = process.env.MONGODB_URI
 
@@ -27,10 +28,10 @@ async function dbConnect() {
     }
 
     cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
-      console.log('✅ MongoDB connected successfully')
+      logger.info('✅ MongoDB connected successfully')
       return mongoose
     }).catch((error) => {
-      console.error('❌ MongoDB connection failed:', error.message)
+      logger.error('❌ MongoDB connection failed:', error.message)
       throw error
     })
   }
@@ -39,7 +40,7 @@ async function dbConnect() {
     cached.conn = await cached.promise
   } catch (e) {
     cached.promise = null
-    console.error('❌ Database connection error:', e)
+    logger.error('❌ Database connection error:', e)
     throw new Error('Failed to connect to database. Please check your connection.')
   }
 

@@ -8,6 +8,9 @@ export interface IUser extends Document {
   avatar?: string
   bio?: string
   role: 'admin' | 'author' | 'reader'
+  emailVerified: boolean
+  verificationToken?: string
+  verificationTokenExpires?: Date
   createdAt: Date
   updatedAt: Date
   comparePassword(password: string): Promise<boolean>
@@ -47,6 +50,18 @@ const UserSchema = new Schema<IUser>({
     type: String,
     enum: ['admin', 'author', 'reader'],
     default: 'reader'
+  },
+  emailVerified: {
+    type: Boolean,
+    default: false
+  },
+  verificationToken: {
+    type: String,
+    select: false
+  },
+  verificationTokenExpires: {
+    type: Date,
+    select: false
   }
 }, {
   timestamps: true

@@ -99,28 +99,29 @@ export default function CommentItem({
   }
 
   return (
-    <div className={`${level > 0 ? 'ml-8 border-l-2 border-gray-100 pl-4' : ''}`}>
-      <div className="bg-white rounded-lg p-4 border">
+    <div className={`${level > 0 ? 'ml-8 border-l-2 border-primary/20 pl-4' : ''}`}>
+      <div className="bg-white rounded-lg p-4 border hover:border-primary/20 transition-colors duration-200">
         <div className="flex items-start justify-between">
           <div className="flex items-start space-x-3 flex-1">
-            <Avatar className="w-8 h-8">
+            <Avatar className="w-8 h-8 hover:scale-105 transition-transform duration-200">
               <AvatarImage 
-                src={comment.author.avatar} 
+                src={comment.author.avatar || ''} 
                 alt={comment.author.name} 
               />
-              <AvatarFallback className="text-sm font-medium">
+              <AvatarFallback className="text-sm font-medium bg-primary/10 text-primary">
                 {comment.author.name.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             
             <div className="flex-1 min-w-0">
               <div className="flex items-center space-x-2 mb-1">
-                <span className="font-medium text-gray-900">
+                <span className="font-medium text-gray-900 hover:text-primary transition-colors duration-200 cursor-pointer">
                   {comment.author.name}
                 </span>
+                <span className="text-gray-300">•</span>
                 <time
                   dateTime={comment.createdAt}
-                  className="text-sm text-gray-500"
+                  className="text-sm text-gray-500 hover:text-gray-700 transition-colors duration-200"
                 >
                   {format(new Date(comment.createdAt), 'MMM dd, yyyy')}
                 </time>
@@ -130,12 +131,13 @@ export default function CommentItem({
                 {comment.content}
               </p>
               
-              <div className="flex items-center space-x-4 mt-3">
+              <div className="flex items-center space-x-3 mt-3">
                 {session && level < 2 && (
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setShowReplyForm(!showReplyForm)}
+                    className="text-xs font-medium text-gray-600 hover:text-primary hover:bg-primary/5 transition-colors duration-200"
                   >
                     Reply
                   </Button>
@@ -148,7 +150,7 @@ export default function CommentItem({
                         variant="ghost"
                         size="sm"
                         disabled={isDeleting}
-                        className="text-red-600 hover:text-red-700"
+                        className="text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors duration-200"
                       >
                         {isDeleting ? 'Deleting...' : 'Delete'}
                       </Button>
