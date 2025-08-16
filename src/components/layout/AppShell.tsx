@@ -9,16 +9,19 @@ interface AppShellProps {
   children: ReactNode
 }
 
-// Conditionally renders global Header and Footer except on auth pages (/auth/*)
 export default function AppShell({ children }: AppShellProps) {
   const pathname = usePathname()
-  const hideChrome = pathname.startsWith('/auth/')
+  const hideChrome = pathname.startsWith('/auth/') || pathname.startsWith('/dashboard/')
+
+  if (hideChrome) {
+    return <>{children}</>
+  }
 
   return (
-    <>
-      {!hideChrome && <Header />}
+    <div className="flex flex-col min-h-screen">
+      <Header />
       <main className="flex-1">{children}</main>
-      {!hideChrome && <Footer />}
-    </>
+      <Footer />
+    </div>
   )
 }

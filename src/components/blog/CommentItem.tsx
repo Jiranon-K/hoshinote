@@ -4,6 +4,19 @@ import { useState } from 'react'
 import { format } from 'date-fns'
 import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import { useToast } from '@/components/ui/toaster'
 import CommentForm from './CommentForm'
 
 interface Comment {
@@ -34,6 +47,7 @@ export default function CommentItem({
   level = 0 
 }: CommentItemProps) {
   const { data: session } = useSession()
+  const { push: pushToast } = useToast()
   const [showReplyForm, setShowReplyForm] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [replies, setReplies] = useState(comment.replies || [])
@@ -48,10 +62,6 @@ export default function CommentItem({
   }
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this comment?')) {
-      return
-    }
-
     setIsDeleting(true)
     try {
       const response = await fetch(`/api/comments/${comment._id}`, {
@@ -60,12 +70,25 @@ export default function CommentItem({
 
       if (response.ok) {
         onCommentDeleted(comment._id)
+        pushToast({
+          title: 'Success',
+          description: 'Comment deleted successfully',
+          type: 'success'
+        })
       } else {
-        alert('Failed to delete comment')
+        pushToast({
+          title: 'Error',
+          description: 'Failed to delete comment',
+          type: 'error'
+        })
       }
     } catch (error) {
       console.error('Error deleting comment:', error)
-      alert('Failed to delete comment')
+      pushToast({
+        title: 'Error',
+        description: 'Failed to delete comment',
+        type: 'error'
+      })
     } finally {
       setIsDeleting(false)
     }
@@ -80,19 +103,15 @@ export default function CommentItem({
       <div className="bg-white rounded-lg p-4 border">
         <div className="flex items-start justify-between">
           <div className="flex items-start space-x-3 flex-1">
-            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
-              {comment.author.avatar ? (
-                <img
-                  src={comment.author.avatar}
-                  alt={comment.author.name}
-                  className="w-full h-full rounded-full object-cover"
-                />
-              ) : (
-                <span className="text-sm font-medium text-gray-600">
-                  {comment.author.name.charAt(0).toUpperCase()}
-                </span>
-              )}
-            </div>
+            <Avatar className="w-8 h-8">
+              <AvatarImage 
+                src={comment.author.avatar} 
+                alt={comment.author.name} 
+              />
+              <AvatarFallback className="text-sm font-medium">
+                {comment.author.name.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
             
             <div className="flex-1 min-w-0">
               <div className="flex items-center space-x-2 mb-1">
@@ -123,15 +142,35 @@ export default function CommentItem({
                 )}
                 
                 {canDeleteComment && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleDelete}
-                    disabled={isDeleting}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    {isDeleting ? 'Deleting...' : 'Delete'}
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        disabled={isDeleting}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        {isDeleting ? 'Deleting...' : 'Delete'}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Comment</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete this comment? This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleDelete}
+                          className="bg-red-600 hover:bg-red-700"
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 )}
               </div>
             </div>

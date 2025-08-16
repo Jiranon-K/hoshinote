@@ -63,7 +63,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${nunito.variable} antialiased min-h-screen flex flex-col font-nunito`}
+        className={`${nunito.variable} antialiased min-h-screen font-nunito`}
       >
         <AuthProvider>
           <ToastProvider>

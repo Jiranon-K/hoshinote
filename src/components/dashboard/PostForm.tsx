@@ -15,10 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import EditorJS from '@/components/editor/EditorJS'
+import TipTapEditor from '@/components/editor/TipTapEditor'
 import ImageUpload from '@/components/ui/image-upload'
 import { postSchema, type PostInput } from '@/lib/validations'
-import { OutputData } from '@editorjs/editorjs'
 
 interface PostFormProps {
   initialData?: Partial<PostInput & { _id?: string; content?: string }>
@@ -29,10 +28,8 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const [content, setContent] = useState<OutputData | null>(
-    initialData?.content 
-      ? (typeof initialData.content === 'string' ? JSON.parse(initialData.content) : initialData.content)
-      : null
+  const [content, setContent] = useState<string>(
+    initialData?.content || ''
   )
   const [imagePreview, setImagePreview] = useState(initialData?.coverImage || '')
   const [imageError, setImageError] = useState(false)
@@ -56,8 +53,22 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
 
   // Sync content state with form
   useEffect(() => {
-    setValue('content', content ? JSON.stringify(content) : JSON.stringify({ blocks: [], version: "2.30.8" }))
+    setValue('content', content)
   }, [content, setValue])
+
+  // Generate random slug for new posts
+  useEffect(() => {
+    if (!isEditing && !initialData?.slug) {
+      const randomSlug = generateRandomSlug()
+      setValue('slug', randomSlug)
+    }
+  }, [isEditing, initialData?.slug, setValue])
+
+  const generateRandomSlug = () => {
+    const randomStr1 = Math.random().toString(36).substring(2, 8)
+    const randomStr2 = Math.random().toString(36).substring(2, 6)
+    return `${randomStr1}${randomStr2}`
+  }
 
   const generateSlug = (title: string) => {
     return title
@@ -69,11 +80,8 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
   }
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const title = e.target.value
-    if (!isEditing) {
-      const slug = generateSlug(title)
-      setValue('slug', slug)
-    }
+    // For new posts, we keep the auto-generated random slug
+    // Title changes don't affect the slug anymore
   }
 
   const handleTagsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,6 +96,7 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
 
   const handleImageUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const url = e.target.value
+    console.log('Image URL changed:', url)
     setValue('coverImage', url)
     setImagePreview(url)
     setImageError(false)
@@ -107,7 +116,7 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
     try {
       const payload = {
         ...data,
-        content: content ? JSON.stringify(content) : JSON.stringify({ blocks: [], version: "2.30.8" })
+        content: content
       }
 
       const url = isEditing 
@@ -142,7 +151,7 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
   const watchedCategories = watch('categories')
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 pb-8">
       <Card>
         <CardHeader>
           <CardTitle>
@@ -188,14 +197,23 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="slug">Slug</Label>
+                <Label htmlFor="slug">
+                  Slug {!isEditing && <span className="text-xs text-gray-500">(Auto-generated)</span>}
+                </Label>
                 <Input
                   id="slug"
                   placeholder="post-url-slug"
                   {...register('slug')}
+                  disabled={!isEditing}
+                  className={!isEditing ? 'bg-gray-100 cursor-not-allowed' : ''}
                 />
                 {errors.slug && (
                   <p className="text-sm text-red-600">{errors.slug.message}</p>
+                )}
+                {!isEditing && (
+                  <p className="text-xs text-gray-500">
+                    🔒 Slug is automatically generated and cannot be edited for new posts
+                  </p>
                 )}
               </div>
             </div>
@@ -219,6 +237,7 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
                     label="Cover Image Upload"
                     currentImage={imagePreview}
                     onUpload={(url) => {
+                      console.log('Image uploaded:', url)
                       setValue('coverImage', url)
                       setImagePreview(url)
                       setImageError(false)
@@ -285,8 +304,8 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
 
             <div className="space-y-2">
               <Label>Content</Label>
-              <EditorJS 
-                data={content}
+              <TipTapEditor 
+                content={content}
                 onChange={setContent}
                 placeholder="Start writing your post..."
               />
@@ -315,7 +334,7 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
                 </Select>
               </div>
 
-              <div className="flex space-x-4 relative z-10">
+              <div className="flex space-x-4">
                 <Button
                   type="button"
                   variant="outline"

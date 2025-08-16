@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge'
 import CommentSection from './CommentSection'
 import { formatSafeDate } from '@/lib/date-utils'
-import EditorJSRenderer from '@/components/editor/EditorJSRenderer'
+import TipTapRenderer from '@/components/editor/TipTapRenderer'
 
 interface PostDetailProps {
   post: {
@@ -103,10 +103,10 @@ export default function PostDetail({ post }: PostDetailProps) {
         </div>
       </header>
 
-      <div className="mb-8">
-        <EditorJSRenderer 
-          data={post.content}
-          className="text-gray-800 leading-relaxed"
+      <div className="mb-12">
+        <TipTapRenderer 
+          content={post.content}
+          className="prose prose-lg prose-slate max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-700 prose-p:leading-8 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 prose-code:text-pink-600 prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-blockquote:border-l-blue-500 prose-blockquote:bg-blue-50 prose-blockquote:py-2 prose-img:rounded-lg prose-img:shadow-md"
         />
       </div>
 

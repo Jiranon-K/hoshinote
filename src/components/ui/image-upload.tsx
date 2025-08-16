@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/components/ui/toaster'
@@ -132,14 +131,31 @@ export default function ImageUpload({
       
       {currentImage ? (
         <div className="space-y-3">
-          <div className="relative h-48 w-full max-w-md bg-gray-100 rounded-lg overflow-hidden border-2 border-dashed border-gray-200">
+          <div className="relative h-48 w-full max-w-md bg-gray-100 rounded-lg overflow-hidden border border-gray-300">
             <img
               src={currentImage}
-              alt="Uploaded image"
+              alt="Cover image preview"
               className="h-full w-full object-cover object-center"
-              onError={() => setError('Failed to load image preview')}
+              crossOrigin="anonymous"
+              onError={(e) => {
+                console.error('Image failed to load:', currentImage)
+                setError(`Failed to load image: ${currentImage}`)
+                e.currentTarget.style.display = 'none'
+              }}
+              onLoad={() => {
+                console.log('Image loaded successfully:', currentImage)
+                setError('')
+              }}
+              style={{ display: 'block' }}
             />
-            <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-10 transition-all duration-200" />
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-500" style={{ display: error ? 'flex' : 'none' }}>
+              <div className="text-center">
+                <svg className="w-8 h-8 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <p className="text-xs">Image not found</p>
+              </div>
+            </div>
           </div>
           <div className="flex gap-2">
             <Button
