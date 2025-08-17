@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import dbConnect from '@/lib/database'
-import { Post, PostLike } from '@/models'
+import { Post, PostLike, User } from '@/models'
 import { postSchema } from '@/lib/validations'
 import { logActivity, generateActivityDescription } from '@/lib/activity-logger'
 
@@ -118,6 +118,27 @@ export async function POST(request: NextRequest) {
     })
     
     await post.populate('author', 'name email avatar')
+    
+   
+    const user = await User.findById((session as any).user.id)
+    if (user && user.role === 'reader') {
+      await User.findByIdAndUpdate((session as any).user.id, { role: 'author' })
+      
+     
+      await logActivity({
+        userId: (session as any).user.id,
+        type: 'role_upgraded',
+        description: generateActivityDescription('role_upgraded', {
+          oldRole: 'reader',
+          newRole: 'author'
+        }),
+        metadata: {
+          oldRole: 'reader',
+          newRole: 'author',
+          trigger: 'first_post_creation'
+        }
+      })
+    }
     
     // Log activity
     await logActivity({

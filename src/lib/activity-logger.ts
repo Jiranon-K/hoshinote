@@ -3,7 +3,7 @@ import dbConnect from './database'
 
 export interface ActivityLogData {
   userId: string
-  type: 'post_created' | 'post_updated' | 'post_deleted' | 'post_published' | 'comment_created' | 'comment_deleted' | 'profile_updated'
+  type: 'post_created' | 'post_updated' | 'post_deleted' | 'post_published' | 'comment_created' | 'comment_deleted' | 'profile_updated' | 'role_upgraded'
   description: string
   metadata?: {
     postId?: string
@@ -11,6 +11,9 @@ export interface ActivityLogData {
     commentId?: string
     oldStatus?: string
     newStatus?: string
+    oldRole?: string
+    newRole?: string
+    trigger?: string
     [key: string]: unknown
   }
 }
@@ -50,6 +53,8 @@ export function generateActivityDescription(type: string, metadata: Record<strin
       return `Deleted a comment on "${metadata.postTitle}"`
     case 'profile_updated':
       return `Updated profile information`
+    case 'role_upgraded':
+      return `Role upgraded from ${metadata.oldRole} to ${metadata.newRole}`
     default:
       return `Performed an action`
   }
