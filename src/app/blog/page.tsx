@@ -31,7 +31,7 @@ async function getPosts() {
     const posts = await Post.find({ status: 'published' })
       .populate('author', 'name email avatar')
       .sort({ publishedAt: -1, createdAt: -1 })
-      .limit(9)
+      .limit(12)
       .lean()
      
     const serializedPosts = posts.map(post => {
@@ -52,7 +52,7 @@ async function getPosts() {
       posts: serializedPosts, 
       pagination: {
         page: 1,
-        limit: 9,
+        limit: 12,
         total: serializedPosts.length,
         pages: 1
       }

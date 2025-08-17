@@ -83,7 +83,7 @@ export default function DashboardSidebar() {
   const isAdmin = (session as any)?.user.role === 'admin'
 
   return (
-    <div className="flex flex-col w-64 bg-white border-r border-gray-200 h-full">
+    <div className="flex flex-col w-64 bg-white border-r border-gray-200 min-h-screen">
       <div className="flex items-center justify-center h-16 border-b border-gray-200 flex-shrink-0">
         <Link href="/" className="text-xl font-bold text-gray-900 cursor-pointer">
           Hoshi-Note

@@ -4,6 +4,15 @@ import { useState, useEffect, useMemo } from 'react'
 import PostCard from './PostCard'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination'
 
 interface Post {
   _id: string
@@ -49,12 +58,12 @@ export default function PostList({ initialPosts = [], initialPagination }: PostL
       const data = await response.json()
       setAllPosts(data.posts)
       if (!search) {
-        setPosts(data.posts.slice(0, 9))
+        setPosts(data.posts.slice(0, 12))
         setPagination({
           page: 1,
-          limit: 9,
+          limit: 12,
           total: data.posts.length,
-          pages: Math.ceil(data.posts.length / 9)
+          pages: Math.ceil(data.posts.length / 12)
         })
       }
     } catch (error) {
@@ -74,7 +83,7 @@ export default function PostList({ initialPosts = [], initialPagination }: PostL
     try {
       const params = new URLSearchParams({
         page: page.toString(),
-        limit: '9'
+        limit: '12'
       })
       
       if (searchQuery) {
@@ -103,12 +112,12 @@ export default function PostList({ initialPosts = [], initialPagination }: PostL
   useEffect(() => {
     if (!search.trim()) {
       setIsRealTimeSearch(true)
-      setPosts(allPosts.slice(0, 9))
+      setPosts(allPosts.slice(0, 12))
       setPagination({
         page: 1,
-        limit: 9,
+        limit: 12,
         total: allPosts.length,
-        pages: Math.ceil(allPosts.length / 9)
+        pages: Math.ceil(allPosts.length / 12)
       })
       return
     }
@@ -222,37 +231,105 @@ export default function PostList({ initialPosts = [], initialPagination }: PostL
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {posts.map((post) => (
               <PostCard key={post._id} post={post} />
             ))}
           </div>
 
           {pagination && pagination.pages > 1 && !(isRealTimeSearch && search) && (
-            <div className="flex justify-center items-center space-x-4">
-              <Button
-                variant="outline"
-                disabled={currentPage === 1 || loading}
-                onClick={() => handlePageChange(currentPage - 1)}
-              >
-                Previous
-              </Button>
-              
-              <span className="text-sm text-gray-600">
-                Page {currentPage} of {pagination.pages}
-              </span>
-              
-              <Button
-                variant="outline"
-                disabled={currentPage === pagination.pages || loading}
-                onClick={() => handlePageChange(currentPage + 1)}
-              >
-                Next
-              </Button>
-            </div>
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+                
+                {/* First page */}
+                {currentPage > 2 && (
+                  <>
+                    <PaginationItem>
+                      <PaginationLink
+                        onClick={() => handlePageChange(1)}
+                        className="cursor-pointer"
+                      >
+                        1
+                      </PaginationLink>
+                    </PaginationItem>
+                    {currentPage > 3 && (
+                      <PaginationItem>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    )}
+                  </>
+                )}
+                
+                {/* Previous page */}
+                {currentPage > 1 && (
+                  <PaginationItem>
+                    <PaginationLink
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      className="cursor-pointer"
+                    >
+                      {currentPage - 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                )}
+                
+                {/* Current page */}
+                <PaginationItem>
+                  <PaginationLink
+                    isActive
+                    className="cursor-default"
+                  >
+                    {currentPage}
+                  </PaginationLink>
+                </PaginationItem>
+                
+                {/* Next page */}
+                {currentPage < pagination.pages && (
+                  <PaginationItem>
+                    <PaginationLink
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      className="cursor-pointer"
+                    >
+                      {currentPage + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                )}
+                
+                {/* Last page */}
+                {currentPage < pagination.pages - 1 && (
+                  <>
+                    {currentPage < pagination.pages - 2 && (
+                      <PaginationItem>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    )}
+                    <PaginationItem>
+                      <PaginationLink
+                        onClick={() => handlePageChange(pagination.pages)}
+                        className="cursor-pointer"
+                      >
+                        {pagination.pages}
+                      </PaginationLink>
+                    </PaginationItem>
+                  </>
+                )}
+                
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => currentPage < pagination.pages && handlePageChange(currentPage + 1)}
+                    className={currentPage === pagination.pages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           )}
           
-          {isRealTimeSearch && search && posts.length > 9 && (
+          {isRealTimeSearch && search && posts.length > 12 && (
             <div className="text-center">
               <p className="text-sm text-gray-500">
                 Showing all {posts.length} matching results
