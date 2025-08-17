@@ -2,6 +2,24 @@ import PostList from '@/components/blog/PostList'
 import dbConnect from '@/lib/database'
 import { Post } from '@/models'
 import { Types } from 'mongoose'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Blog Posts - Discover Stories & Articles',
+  description: 'อ่านบทความและเรื่องราวน่าสนใจ เกี่ยวกับ anime, gaming, และวัฒนธรรมญี่ปุ่น พร้อมบทวิจารณ์เกมและอนิเมะ',
+  keywords: ['blog', 'articles', 'anime', 'gaming', 'japanese culture', 'anime reviews', 'game reviews'],
+  openGraph: {
+    title: 'Blog Posts - Hoshi-Note',
+    description: 'อ่านบทความและเรื่องราวน่าสนใจ เกี่ยวกับ anime, gaming, และวัฒนธรรมญี่ปุ่น',
+    type: 'website',
+    url: '/blog',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Blog Posts - Hoshi-Note',
+    description: 'อ่านบทความและเรื่องราวน่าสนใจ เกี่ยวกับ anime, gaming, และวัฒนธรรมญี่ปุ่น',
+  },
+}
 
 interface PostWithAuthor {
   _id: Types.ObjectId

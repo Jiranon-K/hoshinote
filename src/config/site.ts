@@ -1,4 +1,9 @@
 const getBaseUrl = () => {
+  // Production URL for deployed site
+  if (process.env.NODE_ENV === 'production') {
+    return "https://note.hoshizora.online";
+  }
+  
   const url = process.env.NEXTAUTH_URL || "http://localhost:3000";
   if (url.startsWith('http://') || url.startsWith('https://')) {
     return url;

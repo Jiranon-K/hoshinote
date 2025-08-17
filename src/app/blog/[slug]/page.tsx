@@ -3,6 +3,7 @@ import PostDetail from '@/components/blog/PostDetail'
 import dbConnect from '@/lib/database'
 import { Post } from '@/models'
 import { Types } from 'mongoose'
+import { Metadata } from 'next'
 
 interface PostWithAuthor {
   _id: Types.ObjectId
@@ -31,6 +32,45 @@ interface PageProps {
   params: Promise<{
     slug: string
   }>
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params
+  const post = await getPost(slug)
+  
+  if (!post) {
+    return {
+      title: 'Post Not Found - Hoshi-Note',
+      description: 'The requested blog post was not found.',
+    }
+  }
+
+  return {
+    title: `${post.title} - Hoshi-Note`,
+    description: post.excerpt,
+    keywords: [...post.tags, ...post.categories, 'blog', 'article'],
+    authors: [{ name: post.author.name }],
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      type: 'article',
+      url: `/blog/${post.slug}`,
+      images: post.coverImage ? [{ url: post.coverImage }] : [],
+      publishedTime: post.publishedAt?.toISOString(),
+      modifiedTime: post.updatedAt.toISOString(),
+      authors: [post.author.name],
+      tags: [...post.tags, ...post.categories],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.excerpt,
+      images: post.coverImage ? [post.coverImage] : [],
+    },
+    alternates: {
+      canonical: `/blog/${post.slug}`,
+    },
+  }
 }
 
 async function getPost(slug: string) {
