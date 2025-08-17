@@ -36,28 +36,28 @@ export default function Home() {
                   Where Stories Shine Like Stars
                 </p>
                 
-                <div className="flex gap-4 items-center justify-center flex-col sm:flex-row">
+                <div className="flex gap-6 items-center justify-center flex-col sm:flex-row">
                   {status === 'loading' ? (
                     <div className="animate-pulse">
-                      <div className="h-12 w-32 bg-white/20 rounded-2xl"></div>
+                      <div className="h-14 w-40 bg-white/20 rounded-2xl"></div>
                     </div>
                   ) : session ? (
                     <Link href="/dashboard/posts/new">
-                      <button className="group backdrop-blur-sm bg-white/10 hover:bg-white/20 text-white border-2 border-white/30 hover:border-white/50 px-8 py-3 text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 font-medium">
-                        ✨ Start Writing
+                      <button className="group relative overflow-hidden cursor-pointer backdrop-blur-lg bg-gradient-to-br from-white/20 via-white/10 to-white/5 hover:from-white/30 hover:via-white/20 hover:to-white/10 text-white border border-white/30 hover:border-white/50 px-10 py-4 text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 font-medium tracking-wide before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition-transform before:duration-700 before:ease-out">
+                        <span className="relative z-10">✨ Start Writing</span>
                       </button>
                     </Link>
                   ) : (
                     <Link href="/auth/register">
-                      <button className="group backdrop-blur-sm bg-white/10 hover:bg-white/20 text-white border-2 border-white/30 hover:border-white/50 px-8 py-3 text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 font-medium">
-                        ✨ Get Started
+                      <button className="group relative overflow-hidden cursor-pointer backdrop-blur-lg bg-gradient-to-br from-white/20 via-white/10 to-white/5 hover:from-white/30 hover:via-white/20 hover:to-white/10 text-white border border-white/30 hover:border-white/50 px-10 py-4 text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 font-medium tracking-wide before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition-transform before:duration-700 before:ease-out">
+                        <span className="relative z-10">✨ Get Started</span>
                       </button>
                     </Link>
                   )}
                   
                   <Link href="/blog">
-                    <button className="group backdrop-blur-sm bg-white/5 hover:bg-white/10 text-white/90 hover:text-white border-2 border-white/20 hover:border-white/40 px-8 py-3 text-lg rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 font-medium">
-                      📚 Explore Stories
+                    <button className="group relative overflow-hidden cursor-pointer backdrop-blur-md bg-gradient-to-br from-white/10 via-white/5 to-transparent hover:from-white/20 hover:via-white/10 hover:to-white/5 text-white/90 hover:text-white border border-white/20 hover:border-white/40 px-10 py-4 text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 font-medium tracking-wide before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition-transform before:duration-700 before:ease-out">
+                      <span className="relative z-10">📚 Explore Stories</span>
                     </button>
                   </Link>
                 </div>

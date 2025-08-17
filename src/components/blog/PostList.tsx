@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import PostCard from './PostCard'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -35,13 +35,42 @@ interface PostListProps {
 
 export default function PostList({ initialPosts = [], initialPagination }: PostListProps) {
   const [posts, setPosts] = useState<Post[]>(initialPosts)
+  const [allPosts, setAllPosts] = useState<Post[]>(initialPosts)
   const [pagination, setPagination] = useState(initialPagination)
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
+  const [isRealTimeSearch, setIsRealTimeSearch] = useState(true)
+
+  const fetchAllPosts = async () => {
+    setLoading(true)
+    try {
+      const response = await fetch('/api/posts?limit=100')
+      const data = await response.json()
+      setAllPosts(data.posts)
+      if (!search) {
+        setPosts(data.posts.slice(0, 9))
+        setPagination({
+          page: 1,
+          limit: 9,
+          total: data.posts.length,
+          pages: Math.ceil(data.posts.length / 9)
+        })
+      }
+    } catch (error) {
+      console.error('Error fetching posts:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const fetchPosts = async (page: number = 1, searchQuery: string = '') => {
+    if (isRealTimeSearch && searchQuery) {
+      return
+    }
+    
     setLoading(true)
+    setIsRealTimeSearch(false)
     try {
       const params = new URLSearchParams({
         page: page.toString(),
@@ -56,6 +85,7 @@ export default function PostList({ initialPosts = [], initialPagination }: PostL
       const data = await response.json()
       
       setPosts(data.posts)
+      setAllPosts(data.posts)
       setPagination(data.pagination)
       setCurrentPage(page)
     } catch (error) {
@@ -65,13 +95,66 @@ export default function PostList({ initialPosts = [], initialPagination }: PostL
     }
   }
 
+
+  useEffect(() => {
+    fetchAllPosts()
+  }, [])
+
+  useEffect(() => {
+    if (!search.trim()) {
+      setIsRealTimeSearch(true)
+      setPosts(allPosts.slice(0, 9))
+      setPagination({
+        page: 1,
+        limit: 9,
+        total: allPosts.length,
+        pages: Math.ceil(allPosts.length / 9)
+      })
+      return
+    }
+
+    if (!isRealTimeSearch) {
+      return
+    }
+
+    const debounceTimer = setTimeout(() => {
+      const searchLower = search.toLowerCase().trim()
+      const filtered = allPosts.filter(post => 
+        post.title.toLowerCase().includes(searchLower) ||
+        post.excerpt.toLowerCase().includes(searchLower) ||
+        post.tags.some(tag => tag.toLowerCase().includes(searchLower)) ||
+        post.categories.some(category => category.toLowerCase().includes(searchLower)) ||
+        post.author.name.toLowerCase().includes(searchLower)
+      )
+      
+      setPosts(filtered)
+      setPagination({
+        page: 1,
+        limit: filtered.length,
+        total: filtered.length,
+        pages: 1
+      })
+      setCurrentPage(1)
+    }, 300)
+
+    return () => clearTimeout(debounceTimer)
+  }, [search, allPosts, isRealTimeSearch])
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    fetchPosts(1, search)
+    if (search.trim()) {
+      setIsRealTimeSearch(false)
+      fetchPosts(1, search)
+    }
   }
 
   const handlePageChange = (page: number) => {
     fetchPosts(page, search)
+  }
+
+  const handleSearchInput = (value: string) => {
+    setSearch(value)
+    setIsRealTimeSearch(true)
   }
 
   if (loading && posts.length === 0) {
@@ -94,18 +177,39 @@ export default function PostList({ initialPosts = [], initialPagination }: PostL
 
   return (
     <div className="space-y-8">
-      <form onSubmit={handleSearch} className="flex gap-4">
-        <Input
-          type="text"
-          placeholder="Search posts..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="flex-1"
-        />
-        <Button type="submit" disabled={loading}>
-          {loading ? 'Searching...' : 'Search'}
-        </Button>
-      </form>
+      <div className="flex flex-col gap-4">
+        <form onSubmit={handleSearch} className="flex gap-4">
+          <div className="flex-1 relative">
+            <Input
+              type="text"
+              placeholder="Search posts..."
+              value={search}
+              onChange={(e) => handleSearchInput(e.target.value)}
+              className="flex-1 pr-10"
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => handleSearchInput('')}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                aria-label="Clear search"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+          <Button type="submit" disabled={loading} variant="outline">
+            {loading ? 'Searching...' : 'Search'}
+          </Button>
+        </form>
+        
+        {search && !isRealTimeSearch && (
+          <div className="text-sm text-blue-600 flex items-center gap-2">
+            <span className="inline-block w-2 h-2 bg-blue-500 rounded-full"></span>
+            Search results from server
+          </div>
+        )}
+      </div>
 
       {posts.length === 0 ? (
         <div className="text-center py-12">
@@ -124,7 +228,7 @@ export default function PostList({ initialPosts = [], initialPagination }: PostL
             ))}
           </div>
 
-          {pagination && pagination.pages > 1 && (
+          {pagination && pagination.pages > 1 && !(isRealTimeSearch && search) && (
             <div className="flex justify-center items-center space-x-4">
               <Button
                 variant="outline"
@@ -145,6 +249,14 @@ export default function PostList({ initialPosts = [], initialPagination }: PostL
               >
                 Next
               </Button>
+            </div>
+          )}
+          
+          {isRealTimeSearch && search && posts.length > 9 && (
+            <div className="text-center">
+              <p className="text-sm text-gray-500">
+                Showing all {posts.length} matching results
+              </p>
             </div>
           )}
         </>
