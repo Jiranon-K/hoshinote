@@ -109,27 +109,6 @@ async function getPost(slug: string) {
   }
 }
 
-export async function generateMetadata({ params }: PageProps) {
-  const { slug } = await params
-  const post = await getPost(slug)
-  
-  if (!post) {
-    return {
-      title: 'Post Not Found'
-    }
-  }
-
-  return {
-    title: post.title,
-    description: post.excerpt,
-    openGraph: {
-      title: post.title,
-      description: post.excerpt,
-      images: post.coverImage ? [{ url: post.coverImage }] : []
-    }
-  }
-}
-
 export default async function BlogPostPage({ params }: PageProps) {
   const { slug } = await params
   const post = await getPost(slug)

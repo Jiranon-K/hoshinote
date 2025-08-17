@@ -40,8 +40,53 @@ export default function PostDetail({ post }: PostDetailProps) {
     delay: 2000
   })
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": post.title,
+    "description": post.excerpt,
+    "image": post.coverImage || undefined,
+    "author": {
+      "@type": "Person",
+      "name": post.author.name,
+      "image": post.author.avatar || undefined
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Hoshi-Note",
+      "url": "https://note.hoshizora.online"
+    },
+    "datePublished": post.publishedAt,
+    "dateModified": post.createdAt,
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://note.hoshizora.online/blog/${post.slug}`
+    },
+    "keywords": [...post.tags, ...post.categories].join(", "),
+    "articleSection": post.categories.length > 0 ? post.categories[0] : "Blog",
+    "wordCount": post.content.length,
+    "commentCount": 0,
+    "interactionStatistic": [
+      {
+        "@type": "InteractionCounter",
+        "interactionType": "https://schema.org/LikeAction",
+        "userInteractionCount": post.likes
+      },
+      {
+        "@type": "InteractionCounter", 
+        "interactionType": "https://schema.org/ReadAction",
+        "userInteractionCount": post.views
+      }
+    ]
+  }
+
   return (
-    <article className="max-w-4xl mx-auto">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <article className="max-w-4xl mx-auto">
       {post.coverImage && (
         <div className="relative h-96 overflow-hidden rounded-lg mb-8">
           <Image
@@ -144,5 +189,6 @@ export default function PostDetail({ post }: PostDetailProps) {
 
       <CommentSection postId={post._id} />
     </article>
+    </>
   )
 }
