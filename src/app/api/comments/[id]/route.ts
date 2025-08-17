@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import dbConnect from '@/lib/database'
 import { Comment } from '@/models'
@@ -18,7 +18,7 @@ export async function PUT(
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session?.user) {
+    if (!session || !(session as any)?.user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -45,7 +45,7 @@ export async function PUT(
       )
     }
     
-    if (comment.author.toString() !== session.user.id && session.user.role !== 'admin') {
+    if (comment.author.toString() !== (session as any).user.id && (session as any).user.role !== 'admin') {
       return NextResponse.json(
         { error: 'Not authorized to update this comment' },
         { status: 403 }
@@ -54,11 +54,11 @@ export async function PUT(
     
     const body = await request.json()
     
-    if (session.user.role === 'admin' && body.status) {
+    if ((session as any).user.role === 'admin' && body.status) {
       comment.status = body.status
     }
     
-    if (body.content && comment.author.toString() === session.user.id) {
+    if (body.content && comment.author.toString() === (session as any).user.id) {
       comment.content = body.content
     }
     
@@ -82,7 +82,7 @@ export async function DELETE(
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session?.user) {
+    if (!session || !(session as any)?.user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -109,7 +109,7 @@ export async function DELETE(
       )
     }
     
-    if (comment.author.toString() !== session.user.id && session.user.role !== 'admin') {
+    if (comment.author.toString() !== (session as any).user.id && (session as any).user.role !== 'admin') {
       return NextResponse.json(
         { error: 'Not authorized to delete this comment' },
         { status: 403 }

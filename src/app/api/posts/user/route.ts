@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import dbConnect from '@/lib/database'
 import { Post } from '@/models'
@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session?.user) {
+    if (!session || !(session as any)?.user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -23,8 +23,8 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status')
     
     const skip = (page - 1) * limit
-    const userId = session.user.id
-    const isAdmin = session.user.role === 'admin'
+    const userId = (session as any).user.id
+    const isAdmin = (session as any).user.role === 'admin'
     
     const filter: Record<string, unknown> = isAdmin ? {} : { author: userId }
     

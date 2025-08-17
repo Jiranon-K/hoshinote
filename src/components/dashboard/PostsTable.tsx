@@ -120,7 +120,7 @@ export default function PostsTable({ posts, onPostDeleted }: PostsTableProps) {
   }
 
   const canEditPost = (post: Post) => {
-    return session?.user.role === 'admin' || post.author.email === session?.user.email
+    return (session as any)?.user.role === 'admin' || post.author.email === (session as any)?.user.email
   }
 
   if (posts.length === 0) {

@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import PostForm from '@/components/dashboard/PostForm'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import dbConnect from '@/lib/database'
 import { Post } from '@/models'
@@ -44,12 +44,12 @@ async function getPost(id: string, userId: string, userRole: string) {
 export default async function EditPostPage({ params }: PageProps) {
   const session = await getServerSession(authOptions)
   
-  if (!session?.user) {
+  if (!session || !(session as any)?.user) {
     return notFound()
   }
   
   const { id } = await params
-  const post = await getPost(id, session.user.id, session.user.role)
+  const post = await getPost(id, (session as any).user.id, (session as any).user.role)
   
   if (!post) {
     return notFound()

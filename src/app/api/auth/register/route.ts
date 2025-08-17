@@ -25,7 +25,8 @@ export async function POST(request: NextRequest) {
       role: 'reader'
     })
     
-    const { password, ...userWithoutPassword } = user.toObject()
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: _unused, ...userWithoutPassword } = user.toObject()
     
     return NextResponse.json({
       message: 'User created successfully',

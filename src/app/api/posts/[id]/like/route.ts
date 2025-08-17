@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import dbConnect from '@/lib/database'
 import { Post, PostLike } from '@/models'
@@ -12,7 +12,7 @@ export async function POST(
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session?.user) {
+    if (!session || !(session as any)?.user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -38,7 +38,7 @@ export async function POST(
       )
     }
 
-    const userId = session.user.id
+    const userId = (session as any).user.id
     const existingLike = await PostLike.findOne({
       user: userId,
       post: id
@@ -104,9 +104,9 @@ export async function GET(
     }
 
     let isLiked = false
-    if (session?.user) {
+    if (session && (session as any)?.user) {
       const existingLike = await PostLike.findOne({
-        user: session.user.id,
+        user: (session as any).user.id,
         post: id
       })
       isLiked = !!existingLike

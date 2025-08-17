@@ -94,7 +94,7 @@ export default function PostsPage() {
     fetchPosts(page, statusFilter)
   }
 
-  const isAdmin = session?.user.role === 'admin'
+  const isAdmin = (session as any)?.user.role === 'admin'
 
   return (
     <div className="flex flex-col h-full space-y-6">

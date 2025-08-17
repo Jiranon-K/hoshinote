@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 
 interface LikeData {
@@ -37,7 +37,7 @@ export function useLikePost(postId: string, initialData?: Partial<LikeData>): Us
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchLikeData = async () => {
+  const fetchLikeData = useCallback(async () => {
     try {
       setError(null)
       const response = await fetch(`/api/posts/${postId}/like`)
@@ -54,10 +54,10 @@ export function useLikePost(postId: string, initialData?: Partial<LikeData>): Us
       setError(err instanceof Error ? err.message : 'Unknown error')
       console.error('Error fetching like data:', err)
     }
-  }
+  }, [postId])
 
   const toggleLike = async () => {
-    if (!session?.user) {
+    if (!session || !(session as any)?.user) {
       setError('Authentication required')
       return
     }
@@ -104,7 +104,7 @@ export function useLikePost(postId: string, initialData?: Partial<LikeData>): Us
     if (session !== undefined && postId) {
       fetchLikeData()
     }
-  }, [postId, session])
+  }, [postId, session, fetchLikeData])
 
   return {
     isLiked,

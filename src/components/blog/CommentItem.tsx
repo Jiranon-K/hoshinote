@@ -52,8 +52,8 @@ export default function CommentItem({
   const [isDeleting, setIsDeleting] = useState(false)
   const [replies, setReplies] = useState(comment.replies || [])
 
-  const canDeleteComment = session?.user.role === 'admin' || 
-    comment.author.name === session?.user.name
+  const canDeleteComment = (session as any)?.user.role === 'admin' || 
+    comment.author.name === (session as any)?.user.name
 
   const handleReply = (newComment: Comment) => {
     setReplies([...replies, newComment])

@@ -72,7 +72,7 @@ export default function CommentForm({
         const errorData = await response.json()
         setError(errorData.error || 'Failed to post comment')
       }
-    } catch (error) {
+    } catch {
       setError('An error occurred. Please try again.')
     } finally {
       setIsLoading(false)
@@ -102,15 +102,15 @@ export default function CommentForm({
       <div className="flex items-center space-x-3">
         <Avatar className="w-8 h-8 hover:scale-110 transition-transform duration-200 cursor-pointer">
           <AvatarImage 
-            src={session.user.avatar || ''} 
-            alt={session.user.name || 'User'} 
+            src={(session as any).user.avatar || ''} 
+            alt={(session as any).user.name || 'User'} 
           />
           <AvatarFallback className="text-sm font-medium bg-gray-300 text-gray-600">
-            {session.user.name?.charAt(0).toUpperCase() || 'U'}
+            {(session as any).user.name?.charAt(0).toUpperCase() || 'U'}
           </AvatarFallback>
         </Avatar>
         <span className="font-medium text-gray-900 hover:text-primary transition-colors duration-200 cursor-pointer">
-          {session.user.name}
+          {(session as any).user.name}
         </span>
       </div>
 

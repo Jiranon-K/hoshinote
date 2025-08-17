@@ -1,15 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import dbConnect from '@/lib/database'
 import { Post } from '@/models'
 import { Types } from 'mongoose'
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session?.user) {
+    if (!session || !(session as any)?.user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -18,9 +18,9 @@ export async function GET(request: NextRequest) {
     
     await dbConnect()
     
-    const userId = session.user.id
+    const userId = (session as any).user.id
     const userObjectId = new Types.ObjectId(userId)
-    const isAdmin = session.user.role === 'admin'
+    const isAdmin = (session as any).user.role === 'admin'
     
     const sevenDaysAgo = new Date()
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)

@@ -2,11 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import dbConnect from '@/lib/database'
 import { User } from '@/models'
 import { logger } from '@/lib/logger'
-import { z } from 'zod'
-
-const verifyEmailSchema = z.object({
-  token: z.string().min(1, 'Verification token is required')
-})
 
 export async function GET(request: NextRequest) {
   try {

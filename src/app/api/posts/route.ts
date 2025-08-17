@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import dbConnect from '@/lib/database'
 import { Post, PostLike } from '@/models'
@@ -50,10 +50,10 @@ export async function GET(request: NextRequest) {
     
     let postsWithLikeStatus = posts
     
-    if (session?.user) {
+    if (session && (session as any)?.user) {
       const postIds = posts.map(post => post._id)
       const userLikes = await PostLike.find({
-        user: session.user.id,
+        user: (session as any).user.id,
         post: { $in: postIds }
       }).lean()
       
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
       
       postsWithLikeStatus = posts.map(post => ({
         ...post,
-        isLiked: likedPostIds.has((post._id as any).toString())
+        isLiked: likedPostIds.has(String(post._id))
       }))
     } else {
       postsWithLikeStatus = posts.map(post => ({
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session?.user) {
+    if (!session || !(session as any)?.user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -114,14 +114,14 @@ export async function POST(request: NextRequest) {
     
     const post = await Post.create({
       ...validatedData,
-      author: session.user.id
+      author: (session as any).user.id
     })
     
     await post.populate('author', 'name email avatar')
     
     // Log activity
     await logActivity({
-      userId: session.user.id,
+      userId: (session as any).user.id,
       type: 'post_created',
       description: generateActivityDescription('post_created', {
         postTitle: post.title,

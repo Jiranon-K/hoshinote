@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import dbConnect from '@/lib/database'
 import User from '@/models/User'
@@ -12,13 +12,13 @@ import { deleteFromR2 } from '@/lib/r2'
 export async function GET() {
   try {
     const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
+    if (!(session as any)?.user?.id) {
       throw new APIError('Unauthorized', 401)
     }
 
     await dbConnect()
 
-    const user = await User.findById(session.user.id).select('-password')
+    const user = await User.findById((session as any).user.id).select('-password')
     if (!user) {
       throw new APIError('User not found', 404)
     }
@@ -44,7 +44,7 @@ export async function GET() {
 export async function PUT(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
+    if (!(session as any)?.user?.id) {
       throw new APIError('Unauthorized', 401)
     }
 
@@ -82,7 +82,7 @@ export async function PUT(request: NextRequest) {
     // Check if email is already taken by another user
     const existingUser = await User.findOne({ 
       email: sanitizedData.email, 
-      _id: { $ne: session.user.id } 
+      _id: { $ne: (session as any).user.id } 
     })
     
     if (existingUser) {
@@ -98,7 +98,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const updatedUser = await User.findByIdAndUpdate(
-      session.user.id,
+      (session as any).user.id,
       {
         $set: {
           name: sanitizedData.name,
@@ -129,7 +129,7 @@ export async function PUT(request: NextRequest) {
 
     // Log activity
     await logActivity({
-      userId: session.user.id,
+      userId: (session as any).user.id,
       type: 'profile_updated',
       description: generateActivityDescription('profile_updated'),
       metadata: {}

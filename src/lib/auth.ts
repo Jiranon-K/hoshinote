@@ -1,4 +1,4 @@
-import { NextAuthOptions } from 'next-auth'
+import type { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import dbConnect from './database'
 import { User } from '@/models'
@@ -14,7 +14,7 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
         rememberMe: { label: 'Remember Me', type: 'checkbox' }
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
           return null
         }
@@ -96,11 +96,11 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.sub!
-        session.user.role = token.role as string
-        session.user.avatar = (token.avatar as string) || undefined
-        session.user.name = token.name as string
-        session.user.email = token.email as string
+        (session as any).user.id = token.sub!;
+        (session as any).user.role = token.role as string;
+        (session as any).user.avatar = (token.avatar as string) || undefined;
+        (session as any).user.name = token.name as string;
+        (session as any).user.email = token.email as string;
       }
       return session
     }

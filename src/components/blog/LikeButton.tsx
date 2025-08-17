@@ -38,7 +38,7 @@ export default function LikeButton({
   }, [initialIsLiked, initialLikes])
 
   const handleLike = async () => {
-    if (!session?.user) {
+    if (!session || !(session as any)?.user) {
       return
     }
 

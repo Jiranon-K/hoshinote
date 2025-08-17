@@ -70,16 +70,8 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
     return `${randomStr1}${randomStr2}`
   }
 
-  const generateSlug = (title: string) => {
-    return title
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .trim()
-  }
 
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTitleChange = () => {
     // For new posts, we keep the auto-generated random slug
     // Title changes don't affect the slug anymore
   }
@@ -188,7 +180,7 @@ export default function PostForm({ initialData, isEditing = false }: PostFormPro
                   {...register('title')}
                   onChange={(e) => {
                     register('title').onChange(e)
-                    handleTitleChange(e)
+                    handleTitleChange()
                   }}
                 />
                 {errors.title && (

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import dbConnect from '@/lib/database'
 import { Activity } from '@/models'
@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session?.user?.id) {
+    if (!session || !(session as { user?: { id: string } })?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -20,13 +20,13 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit
 
     const activities = await Activity
-      .find({ user: session.user.id })
+      .find({ user: ((session as { user: { id: string } }).user.id) })
       .sort({ createdAt: -1 })
       .limit(Math.min(limit, 50))
       .skip(skip)
       .lean()
 
-    const total = await Activity.countDocuments({ user: session.user.id })
+    const total = await Activity.countDocuments({ user: ((session as { user: { id: string } }).user.id) })
 
     return NextResponse.json({
       activities,

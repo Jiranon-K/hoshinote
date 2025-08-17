@@ -80,7 +80,7 @@ const adminNavigation = [
 export default function DashboardSidebar() {
   const pathname = usePathname()
   const { data: session } = useSession()
-  const isAdmin = session?.user.role === 'admin'
+  const isAdmin = (session as any)?.user.role === 'admin'
 
   return (
     <div className="flex flex-col w-64 bg-white border-r border-gray-200 h-full">
@@ -136,10 +136,10 @@ export default function DashboardSidebar() {
       <div className="p-4 border-t border-gray-200 flex-shrink-0">
         <div className="flex items-center">
           <div className="relative w-8 h-8 rounded-full overflow-hidden bg-gray-100 ring-1 ring-gray-200 shrink-0">
-            {session?.user.avatar ? (
+            {(session as any)?.user.avatar ? (
               <Image
-                src={session.user.avatar}
-                alt={session.user.name || 'User'}
+                src={(session as any).user.avatar}
+                alt={(session as any).user.name || 'User'}
                 fill
                 className="object-cover object-center"
                 sizes="32px"
@@ -147,17 +147,17 @@ export default function DashboardSidebar() {
             ) : (
               <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
                 <span className="text-white text-xs font-medium">
-                  {session?.user.name?.charAt(0).toUpperCase()}
+                  {(session as any)?.user.name?.charAt(0).toUpperCase()}
                 </span>
               </div>
             )}
           </div>
           <div className="ml-3">
             <p className="text-sm font-medium text-gray-900">
-              {session?.user.name}
+              {(session as any)?.user.name}
             </p>
             <p className="text-xs text-gray-500 capitalize">
-              {session?.user.role}
+              {(session as any)?.user.role}
             </p>
           </div>
         </div>

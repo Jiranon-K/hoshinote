@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import dbConnect from '@/lib/database'
 import { Post, PostLike } from '@/models'
@@ -37,10 +37,10 @@ export async function GET(
     )
     
     let isLiked = false
-    if (session?.user) {
+    if (session && (session as any)?.user) {
       const existingLike = await PostLike.findOne({
-        user: session.user.id,
-        post: (post as any)._id
+        user: (session as any).user.id,
+        post: String((post as any)._id)
       })
       isLiked = !!existingLike
     }

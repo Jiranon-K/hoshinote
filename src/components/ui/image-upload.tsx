@@ -136,6 +136,7 @@ export default function ImageUpload({
       {currentImage ? (
         <div className="space-y-3">
           <div className="relative h-48 w-full max-w-md bg-gray-100 rounded-lg overflow-hidden border border-gray-300">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={currentImage}
               alt="Cover image preview"

@@ -33,7 +33,7 @@ export default function ProtectedRoute({
         'admin': 3
       }
 
-      const userLevel = roleHierarchy[session.user.role as keyof typeof roleHierarchy] || 0
+      const userLevel = roleHierarchy[(session as any).user.role as keyof typeof roleHierarchy] || 0
       const requiredLevel = roleHierarchy[requiredRole]
 
       if (userLevel < requiredLevel) {
@@ -62,7 +62,7 @@ export default function ProtectedRoute({
       'admin': 3
     }
 
-    const userLevel = roleHierarchy[session.user.role as keyof typeof roleHierarchy] || 0
+    const userLevel = roleHierarchy[(session as any).user.role as keyof typeof roleHierarchy] || 0
     const requiredLevel = roleHierarchy[requiredRole]
 
     if (userLevel < requiredLevel) {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import dbConnect from '@/lib/database'
 import { Post } from '@/models'
@@ -59,7 +59,7 @@ export async function PUT(
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session?.user) {
+    if (!session || !(session as any)?.user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -86,7 +86,7 @@ export async function PUT(
       )
     }
     
-    if (post.author.toString() !== session.user.id && session.user.role !== 'admin') {
+    if (post.author.toString() !== (session as any).user.id && (session as any).user.role !== 'admin') {
       return NextResponse.json(
         { error: 'Not authorized to update this post' },
         { status: 403 }
@@ -122,7 +122,7 @@ export async function PUT(
     const activityType = isStatusChange && validatedData.status === 'published' ? 'post_published' : 'post_updated'
     
     await logActivity({
-      userId: session.user.id,
+      userId: (session as any).user.id,
       type: activityType,
       description: generateActivityDescription(activityType, {
         postTitle: updatedPost.title,
@@ -163,7 +163,7 @@ export async function DELETE(
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session?.user) {
+    if (!session || !(session as any)?.user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -190,7 +190,7 @@ export async function DELETE(
       )
     }
     
-    if (post.author.toString() !== session.user.id && session.user.role !== 'admin') {
+    if (post.author.toString() !== (session as any).user.id && (session as any).user.role !== 'admin') {
       return NextResponse.json(
         { error: 'Not authorized to delete this post' },
         { status: 403 }
@@ -199,7 +199,7 @@ export async function DELETE(
     
     // Log activity before deletion
     await logActivity({
-      userId: session.user.id,
+      userId: (session as any).user.id,
       type: 'post_deleted',
       description: generateActivityDescription('post_deleted', {
         postTitle: post.title,

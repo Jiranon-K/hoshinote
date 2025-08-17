@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import dbConnect from '@/lib/database'
 import { Comment, Post } from '@/models'
@@ -81,7 +81,7 @@ export async function POST(
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session?.user) {
+    if (!session || !(session as any)?.user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -132,7 +132,7 @@ export async function POST(
     
     const comment = await Comment.create({
       post: id,
-      author: session.user.id,
+      author: (session as any).user.id,
       content: validatedData.content,
       parentComment: validatedData.parentCommentId || null,
       status: 'approved'

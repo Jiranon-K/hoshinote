@@ -9,7 +9,7 @@ export const formatSafeDate = (dateString?: string, formatStr: string = 'MMM dd,
       return 'Invalid date'
     }
     return format(date, formatStr)
-  } catch (error) {
+  } catch {
     return 'Invalid date'
   }
 }
@@ -20,7 +20,7 @@ export const isValidDate = (dateString?: string): boolean => {
   try {
     const date = new Date(dateString)
     return !isNaN(date.getTime())
-  } catch (error) {
+  } catch {
     return false
   }
 }

@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -75,7 +74,6 @@ export default function ProfilePage() {
     resolver: zodResolver(profileSchema)
   })
 
-  const watchedAvatar = watch('avatar')
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -388,6 +386,7 @@ export default function ProfilePage() {
                     onClick={editing ? () => fileInputRef.current?.click() : undefined}
                   >
                     {profile.avatar ? (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={profile.avatar}
                         alt={profile.name}

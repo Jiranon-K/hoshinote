@@ -60,14 +60,14 @@ export default function DashboardPage() {
     )
   }
 
-  const isAdmin = session?.user.role === 'admin'
+  const isAdmin = (session as any)?.user?.role === 'admin'
 
   return (
     <div className="flex flex-col h-full space-y-4">
       <div className="flex items-center justify-between flex-shrink-0">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            Welcome back, {session?.user.name}!
+            Welcome back, {(session as any)?.user?.name}!
           </h1>
           <p className="text-gray-600">
             Here&apos;s what&apos;s happening with your {isAdmin ? 'platform' : 'blog'}.

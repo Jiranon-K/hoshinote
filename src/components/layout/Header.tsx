@@ -7,7 +7,6 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { siteConfig } from '@/config/site'
 import { cn } from '@/lib/utils'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -141,24 +140,25 @@ export default function Header() {
                   <div className="mt-6 space-y-4">
                     <div className="flex items-center gap-3 rounded-md border p-3">
                       <div className="relative h-9 w-9 rounded-full overflow-hidden bg-gray-100 ring-2 ring-gray-200 shrink-0">
-                        {session.user.avatar ? (
+                        {(session as any).user.avatar ? (
+                          // eslint-disable-next-line @next/next/no-img-element
                           <img
-                            src={session.user.avatar}
-                            alt={session.user.name || 'User'}
+                            src={(session as any).user.avatar}
+                            alt={(session as any).user.name || 'User'}
                             className="h-full w-full object-cover object-center"
-                            key={session.user.avatar}
+                            key={(session as any).user.avatar}
                           />
                         ) : (
                           <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
                             <span className="text-white text-sm font-medium">
-                              {(session.user.name || 'U').split(' ').map(p => p[0]).join('').slice(0,2).toUpperCase()}
+                              {((session as any).user.name || 'U').split(' ').map((p: string) => p[0]).join('').slice(0,2).toUpperCase()}
                             </span>
                           </div>
                         )}
                       </div>
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-medium">{session.user.name}</p>
-                        <p className="truncate text-xs text-muted-foreground">{session.user.email}</p>
+                        <p className="truncate text-sm font-medium">{(session as any).user.name}</p>
+                        <p className="truncate text-xs text-muted-foreground">{(session as any).user.email}</p>
                       </div>
                     </div>
                     <div className="flex flex-col gap-2">
@@ -193,28 +193,29 @@ export default function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="flex items-center gap-2 rounded-full pl-1 pr-3 hover:ring-2 hover:ring-primary/20 transition-all duration-200" size="sm">
                     <div className="relative h-6 w-6 rounded-full overflow-hidden bg-gray-100 ring-1 ring-gray-200 transition-all duration-200 hover:ring-2 hover:ring-primary/30 hover:scale-110">
-                      {session.user.avatar ? (
+                      {(session as any).user.avatar ? (
+                        // eslint-disable-next-line @next/next/no-img-element
                         <img
-                          src={session.user.avatar}
-                          alt={session.user.name || 'User'}
+                          src={(session as any).user.avatar}
+                          alt={(session as any).user.name || 'User'}
                           className="h-full w-full object-cover object-center transition-transform duration-200 hover:scale-105"
-                          key={session.user.avatar}
+                          key={(session as any).user.avatar}
                         />
                       ) : (
                         <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 transition-all duration-200 hover:from-blue-400 hover:to-purple-500">
                           <span className="text-white text-[10px] font-medium">
-                            {(session.user.name || 'U').substring(0,2).toUpperCase()}
+                            {((session as any).user.name || 'U').substring(0,2).toUpperCase()}
                           </span>
                         </div>
                       )}
                     </div>
-                    <span className="hidden max-w-[90px] truncate sm:inline text-xs font-medium transition-colors duration-200">{session.user.name}</span>
+                    <span className="hidden max-w-[90px] truncate sm:inline text-xs font-medium transition-colors duration-200">{(session as any).user.name}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel className="flex flex-col">
                     <span className="text-xs font-normal text-muted-foreground">Signed in as</span>
-                    <span className="truncate font-medium text-foreground">{session.user.email}</span>
+                    <span className="truncate font-medium text-foreground">{(session as any).user.email}</span>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
