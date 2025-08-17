@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import dbConnect from '@/lib/database'
 import { Post, Comment } from '@/models'
+import { Types } from 'mongoose'
 
 export async function GET(request: NextRequest) {
   try {
@@ -18,6 +19,7 @@ export async function GET(request: NextRequest) {
     await dbConnect()
     
     const userId = session.user.id
+    const userObjectId = new Types.ObjectId(userId)
     const isAdmin = session.user.role === 'admin'
     
     if (isAdmin) {
@@ -61,16 +63,16 @@ export async function GET(request: NextRequest) {
         userViews,
         userLikes
       ] = await Promise.all([
-        Post.countDocuments({ author: userId }),
-        Post.countDocuments({ author: userId, status: 'published' }),
-        Post.countDocuments({ author: userId, status: 'draft' }),
-        Comment.countDocuments({ author: userId }),
+        Post.countDocuments({ author: userObjectId }),
+        Post.countDocuments({ author: userObjectId, status: 'published' }),
+        Post.countDocuments({ author: userObjectId, status: 'draft' }),
+        Comment.countDocuments({ author: userObjectId }),
         Post.aggregate([
-          { $match: { author: userId } },
+          { $match: { author: userObjectId } },
           { $group: { _id: null, total: { $sum: '$views' } } }
         ]),
         Post.aggregate([
-          { $match: { author: userId } },
+          { $match: { author: userObjectId } },
           { $group: { _id: null, total: { $sum: '$likes' } } }
         ])
       ])

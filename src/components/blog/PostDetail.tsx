@@ -6,6 +6,7 @@ import { formatSafeDate } from '@/lib/date-utils'
 import TipTapRenderer from '@/components/editor/TipTapRenderer'
 import Image from 'next/image'
 import { useState } from 'react'
+import { useSimpleViewTracker } from '@/hooks/useSimpleViewTracker'
 
 interface PostDetailProps {
   post: {
@@ -31,6 +32,11 @@ interface PostDetailProps {
 
 export default function PostDetail({ post }: PostDetailProps) {
   const [avatarError, setAvatarError] = useState(false)
+  
+  useSimpleViewTracker({ 
+    postId: post._id,
+    delay: 2000
+  })
 
   return (
     <article className="max-w-4xl mx-auto">

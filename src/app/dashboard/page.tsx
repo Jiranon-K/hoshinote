@@ -4,6 +4,8 @@ import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import StatsCard from '@/components/dashboard/StatsCard'
 import RecentActivity from '@/components/dashboard/RecentActivity'
+import ViewsAnalytics from '@/components/dashboard/ViewsAnalytics'
+import TrendingPosts from '@/components/dashboard/TrendingPosts'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -61,7 +63,7 @@ export default function DashboardPage() {
   const isAdmin = session?.user.role === 'admin'
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 max-h-screen overflow-y-auto">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
@@ -125,15 +127,20 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
+      <div className="grid gap-4 lg:grid-cols-2 h-96">
+        <ViewsAnalytics />
+        <TrendingPosts />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 h-80">
+        <Card className="h-full flex flex-col">
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
             <CardDescription>
               Common tasks you might want to perform
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="flex-1 space-y-3">
             <Link href="/dashboard/posts/new" className="block cursor-pointer">
               <Button variant="outline" className="w-full justify-start cursor-pointer">
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -163,14 +170,14 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="h-full flex flex-col">
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
             <CardDescription>
               Your latest blog activity
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex-1 overflow-y-auto">
             <RecentActivity />
           </CardContent>
         </Card>

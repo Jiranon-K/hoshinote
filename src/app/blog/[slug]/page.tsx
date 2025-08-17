@@ -61,9 +61,6 @@ async function getPost(slug: string) {
       }
     }
     
-    await Post.findByIdAndUpdate(typedPost._id, { 
-      $inc: { views: 1 } 
-    })
     
     return serializedPost
   } catch (error) {
