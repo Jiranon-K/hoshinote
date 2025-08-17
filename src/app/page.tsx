@@ -10,13 +10,13 @@ export default function Home() {
     <div className="h-screen overflow-hidden">
       <div className="relative h-full overflow-hidden">
         <video
-          className="absolute inset-0 w-full h-full object-cover opacity-60"
+          className="absolute inset-0 w-full h-full object-cover"
           autoPlay
           muted
           loop
           playsInline
         >
-          <source src="/banner/kafka-x-silver-wolf-honkai-star-rail-moewalls-com.mp4" type="video/mp4" />
+          <source src="/banner/totoro-watching-starry-night-sky-moewalls-com.mp4" type="video/mp4" />
         </video>
         
         <div className="absolute inset-0 bg-gradient-to-br from-purple-900/30 via-black/20 to-pink-900/30" />

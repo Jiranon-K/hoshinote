@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import dbConnect from '@/lib/database'
-import { Post } from '@/models'
+import { Post, PostLike } from '@/models'
 
 interface RouteParams {
   params: Promise<{
@@ -13,6 +15,7 @@ export async function GET(
   { params }: RouteParams
 ) {
   try {
+    const session = await getServerSession(authOptions)
     await dbConnect()
     
     const { slug } = await params
@@ -33,7 +36,19 @@ export async function GET(
       { $inc: { views: 1 } }
     )
     
-    return NextResponse.json(post)
+    let isLiked = false
+    if (session?.user) {
+      const existingLike = await PostLike.findOne({
+        user: session.user.id,
+        post: (post as any)._id
+      })
+      isLiked = !!existingLike
+    }
+    
+    return NextResponse.json({
+      ...post,
+      isLiked
+    })
   } catch (error) {
     console.error('Error fetching post by slug:', error)
     return NextResponse.json(

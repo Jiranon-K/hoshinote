@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import dbConnect from '@/lib/database'
-import { Post } from '@/models'
+import { Post, PostLike } from '@/models'
 import { postSchema } from '@/lib/validations'
 import { logActivity, generateActivityDescription } from '@/lib/activity-logger'
 
 export async function GET(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions)
     await dbConnect()
     
     const { searchParams } = new URL(request.url)
@@ -47,8 +48,30 @@ export async function GET(request: NextRequest) {
     
     const total = await Post.countDocuments(filter)
     
+    let postsWithLikeStatus = posts
+    
+    if (session?.user) {
+      const postIds = posts.map(post => post._id)
+      const userLikes = await PostLike.find({
+        user: session.user.id,
+        post: { $in: postIds }
+      }).lean()
+      
+      const likedPostIds = new Set(userLikes.map(like => like.post.toString()))
+      
+      postsWithLikeStatus = posts.map(post => ({
+        ...post,
+        isLiked: likedPostIds.has((post._id as any).toString())
+      }))
+    } else {
+      postsWithLikeStatus = posts.map(post => ({
+        ...post,
+        isLiked: false
+      }))
+    }
+    
     return NextResponse.json({
-      posts,
+      posts: postsWithLikeStatus,
       pagination: {
         page,
         limit,
