@@ -45,7 +45,7 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="flex flex-col h-full space-y-6">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="animate-pulse">
@@ -63,8 +63,8 @@ export default function DashboardPage() {
   const isAdmin = session?.user.role === 'admin'
 
   return (
-    <div className="space-y-4 max-h-screen overflow-y-auto">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col h-full space-y-4">
+      <div className="flex items-center justify-between flex-shrink-0">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
             Welcome back, {session?.user.name}!
@@ -79,7 +79,7 @@ export default function DashboardPage() {
       </div>
 
       {stats && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 flex-shrink-0">
           <StatsCard
             title={isAdmin ? "Total Posts" : "My Posts"}
             value={stats.totalPosts}
@@ -127,14 +127,14 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-2 h-96">
+      <div className="grid gap-4 lg:grid-cols-2 flex-1 min-h-0">
         <ViewsAnalytics />
         <TrendingPosts />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 h-80">
+      <div className="grid gap-4 md:grid-cols-2 flex-1 min-h-0">
         <Card className="h-full flex flex-col">
-          <CardHeader>
+          <CardHeader className="flex-shrink-0">
             <CardTitle>Quick Actions</CardTitle>
             <CardDescription>
               Common tasks you might want to perform
@@ -171,14 +171,16 @@ export default function DashboardPage() {
         </Card>
 
         <Card className="h-full flex flex-col">
-          <CardHeader>
+          <CardHeader className="flex-shrink-0">
             <CardTitle>Recent Activity</CardTitle>
             <CardDescription>
               Your latest blog activity
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex-1 overflow-y-auto">
-            <RecentActivity />
+          <CardContent className="flex-1 overflow-hidden">
+            <div className="h-full overflow-y-auto">
+              <RecentActivity />
+            </div>
           </CardContent>
         </Card>
       </div>

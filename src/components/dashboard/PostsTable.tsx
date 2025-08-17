@@ -144,34 +144,35 @@ export default function PostsTable({ posts, onPostDeleted }: PostsTableProps) {
 
   return (
     <TooltipProvider>
-      <div className="border rounded-lg overflow-hidden bg-white shadow-sm">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-gray-50/50">
-              <TableHead className="font-semibold">Title</TableHead>
-              <TableHead className="font-semibold">Status</TableHead>
-              <TableHead className="font-semibold">Author</TableHead>
-              <TableHead className="font-semibold text-center">
-                <div className="flex items-center justify-center gap-1">
-                  <Eye className="w-4 h-4" />
-                  <span>Views</span>
-                </div>
-              </TableHead>
-              <TableHead className="font-semibold text-center">
-                <div className="flex items-center justify-center gap-1">
-                  <Heart className="w-4 h-4" />
-                  <span>Likes</span>
-                </div>
-              </TableHead>
-              <TableHead className="font-semibold">
-                <div className="flex items-center gap-1">
-                  <Calendar className="w-4 h-4" />
-                  <span>Date</span>
-                </div>
-              </TableHead>
-              <TableHead className="text-right font-semibold">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
+      <div className="border rounded-lg bg-white shadow-sm h-full flex flex-col">
+        <div className="flex-1 overflow-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-gray-50/50">
+                <TableHead className="font-semibold min-w-[200px]">Title</TableHead>
+                <TableHead className="font-semibold">Status</TableHead>
+                <TableHead className="font-semibold hidden md:table-cell">Author</TableHead>
+                <TableHead className="font-semibold text-center hidden lg:table-cell">
+                  <div className="flex items-center justify-center gap-1">
+                    <Eye className="w-4 h-4" />
+                    <span>Views</span>
+                  </div>
+                </TableHead>
+                <TableHead className="font-semibold text-center hidden lg:table-cell">
+                  <div className="flex items-center justify-center gap-1">
+                    <Heart className="w-4 h-4" />
+                    <span>Likes</span>
+                  </div>
+                </TableHead>
+                <TableHead className="font-semibold hidden sm:table-cell">
+                  <div className="flex items-center gap-1">
+                    <Calendar className="w-4 h-4" />
+                    <span>Date</span>
+                  </div>
+                </TableHead>
+                <TableHead className="text-right font-semibold">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
           <TableBody>
             {posts.map((post) => (
               <TableRow 
@@ -179,7 +180,7 @@ export default function PostsTable({ posts, onPostDeleted }: PostsTableProps) {
                 className="group hover:bg-gray-50/50 transition-colors duration-200"
               >
                 <TableCell className="py-4">
-                  <div className="max-w-md">
+                  <div className="min-w-[200px] max-w-md">
                     <Link
                       href={`/blog/${post.slug}`}
                       className="font-medium text-gray-900 hover:text-blue-600 transition-colors duration-200 line-clamp-2"
@@ -188,13 +189,13 @@ export default function PostsTable({ posts, onPostDeleted }: PostsTableProps) {
                       {post.title}
                     </Link>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm text-gray-500">/{post.slug}</span>
+                      <span className="text-sm text-gray-500 truncate">/{post.slug}</span>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110 hover:bg-primary/10"
+                            className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110 hover:bg-primary/10 flex-shrink-0"
                             onClick={() => copyToClipboard(`${window.location.origin}/blog/${post.slug}`)}
                           >
                             <Copy className="w-3 h-3 transition-transform duration-200 hover:rotate-12" />
@@ -205,32 +206,38 @@ export default function PostsTable({ posts, onPostDeleted }: PostsTableProps) {
                         </TooltipContent>
                       </Tooltip>
                     </div>
+                    <div className="md:hidden mt-2 space-y-1">
+                      <div className="flex items-center gap-2 text-sm text-gray-500">
+                        <span>{post.author.name}</span>
+                        <span className="lg:hidden">• {post.views} views • {post.likes} likes</span>
+                      </div>
+                    </div>
                   </div>
                 </TableCell>
                 <TableCell className="py-4">
                   {getStatusBadge(post.status)}
                 </TableCell>
-                <TableCell className="py-4">
+                <TableCell className="py-4 hidden md:table-cell">
                   <div>
                     <p className="font-medium text-gray-900">{post.author.name}</p>
                     <p className="text-sm text-gray-500">{post.author.email}</p>
                   </div>
                 </TableCell>
-                <TableCell className="py-4 text-center">
+                <TableCell className="py-4 text-center hidden lg:table-cell">
                   <div className="flex items-center justify-center gap-1">
                     <span className="font-medium">{post.views}</span>
                   </div>
                 </TableCell>
-                <TableCell className="py-4 text-center">
+                <TableCell className="py-4 text-center hidden lg:table-cell">
                   <div className="flex items-center justify-center gap-1">
                     <span className="font-medium text-red-500">{post.likes}</span>
                   </div>
                 </TableCell>
-                <TableCell className="py-4">
+                <TableCell className="py-4 hidden sm:table-cell">
                   <div>
                     {post.publishedAt ? (
                       <div className="flex items-center gap-1">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
                         <div>
                           <p className="text-sm font-medium text-gray-900">Published</p>
                           <p className="text-xs text-gray-500">
@@ -240,7 +247,7 @@ export default function PostsTable({ posts, onPostDeleted }: PostsTableProps) {
                       </div>
                     ) : (
                       <div className="flex items-center gap-1">
-                        <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                        <div className="w-2 h-2 bg-gray-400 rounded-full flex-shrink-0"></div>
                         <div>
                           <p className="text-sm font-medium text-gray-500">Created</p>
                           <p className="text-xs text-gray-500">
@@ -332,9 +339,10 @@ export default function PostsTable({ posts, onPostDeleted }: PostsTableProps) {
                 </TableCell>
             </TableRow>
           ))}
-        </TableBody>
-      </Table>
-    </div>
+          </TableBody>
+          </Table>
+        </div>
+      </div>
     </TooltipProvider>
   )
 }

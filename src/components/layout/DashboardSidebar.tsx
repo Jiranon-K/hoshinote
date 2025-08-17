@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { cn } from '@/lib/utils'
@@ -82,8 +83,8 @@ export default function DashboardSidebar() {
   const isAdmin = session?.user.role === 'admin'
 
   return (
-    <div className="flex flex-col w-64 bg-white border-r border-gray-200">
-      <div className="flex items-center justify-center h-16 border-b border-gray-200">
+    <div className="flex flex-col w-64 bg-white border-r border-gray-200 h-full">
+      <div className="flex items-center justify-center h-16 border-b border-gray-200 flex-shrink-0">
         <Link href="/" className="text-xl font-bold text-gray-900 cursor-pointer">
           Hoshi-Note
         </Link>
@@ -132,12 +133,24 @@ export default function DashboardSidebar() {
         )}
       </nav>
       
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-gray-200 flex-shrink-0">
         <div className="flex items-center">
-          <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-            <span className="text-sm font-medium text-gray-600">
-              {session?.user.name?.charAt(0).toUpperCase()}
-            </span>
+          <div className="relative w-8 h-8 rounded-full overflow-hidden bg-gray-100 ring-1 ring-gray-200 shrink-0">
+            {session?.user.avatar ? (
+              <Image
+                src={session.user.avatar}
+                alt={session.user.name || 'User'}
+                fill
+                className="object-cover object-center"
+                sizes="32px"
+              />
+            ) : (
+              <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
+                <span className="text-white text-xs font-medium">
+                  {session?.user.name?.charAt(0).toUpperCase()}
+                </span>
+              </div>
+            )}
           </div>
           <div className="ml-3">
             <p className="text-sm font-medium text-gray-900">

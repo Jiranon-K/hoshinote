@@ -97,9 +97,9 @@ export default function PostsPage() {
   const isAdmin = session?.user.role === 'admin'
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col h-full space-y-6">
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 flex-shrink-0">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
             {isAdmin ? 'All Posts' : 'My Posts'}
@@ -116,10 +116,10 @@ export default function PostsPage() {
         </Link>
       </div>
 
-      <Separator />
+      <Separator className="flex-shrink-0" />
 
       {/* Filters and Search Section */}
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col sm:flex-row gap-4 flex-shrink-0">
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-gray-500" />
           <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -148,116 +148,127 @@ export default function PostsPage() {
         </div>
       </div>
 
-      {loading ? (
-        <div className="border rounded-lg overflow-hidden bg-white shadow-sm">
-          <div className="bg-gray-50/50 p-4 border-b">
-            <div className="grid grid-cols-7 gap-4">
-              <Skeleton className="h-4 w-16" />
-              <Skeleton className="h-4 w-16" />
-              <Skeleton className="h-4 w-16" />
-              <Skeleton className="h-4 w-12" />
-              <Skeleton className="h-4 w-12" />
-              <Skeleton className="h-4 w-16" />
-              <Skeleton className="h-4 w-16" />
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-h-0">
+        {loading ? (
+          <div className="border rounded-lg overflow-hidden bg-white shadow-sm flex-1">
+            <div className="bg-gray-50/50 p-4 border-b">
+              <div className="grid grid-cols-7 gap-4">
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-4 w-12" />
+                <Skeleton className="h-4 w-12" />
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-4 w-16" />
+              </div>
+            </div>
+            <div className="divide-y">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="p-4">
+                  <div className="grid grid-cols-7 gap-4 items-center">
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-48" />
+                      <Skeleton className="h-3 w-24" />
+                    </div>
+                    <Skeleton className="h-6 w-16 rounded-full" />
+                    <div className="space-y-1">
+                      <Skeleton className="h-3 w-24" />
+                      <Skeleton className="h-2 w-32" />
+                    </div>
+                    <Skeleton className="h-4 w-8" />
+                    <Skeleton className="h-4 w-6" />
+                    <div className="space-y-1">
+                      <Skeleton className="h-3 w-16" />
+                      <Skeleton className="h-2 w-20" />
+                    </div>
+                    <Skeleton className="h-8 w-8 rounded ml-auto" />
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-          <div className="divide-y">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="p-4">
-                <div className="grid grid-cols-7 gap-4 items-center">
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-48" />
-                    <Skeleton className="h-3 w-24" />
-                  </div>
-                  <Skeleton className="h-6 w-16 rounded-full" />
-                  <div className="space-y-1">
-                    <Skeleton className="h-3 w-24" />
-                    <Skeleton className="h-2 w-32" />
-                  </div>
-                  <Skeleton className="h-4 w-8" />
-                  <Skeleton className="h-4 w-6" />
-                  <div className="space-y-1">
-                    <Skeleton className="h-3 w-16" />
-                    <Skeleton className="h-2 w-20" />
-                  </div>
-                  <Skeleton className="h-8 w-8 rounded ml-auto" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : (
-        <>
-          <PostsTable posts={posts} onPostDeleted={handlePostDeleted} />
+        ) : (
+          <>
+            <div className="flex-1">
+              <PostsTable posts={posts} onPostDeleted={handlePostDeleted} />
+            </div>
 
-          {pagination && pagination.pages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
-              <div className="text-sm text-gray-600">
-                Showing <span className="font-medium">{(currentPage - 1) * pagination.limit + 1}</span> to{' '}
-                <span className="font-medium">
-                  {Math.min(currentPage * pagination.limit, pagination.total)}
-                </span> of{' '}
-                <span className="font-medium">{pagination.total}</span> posts
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={currentPage === 1 || loading}
-                  onClick={() => handlePageChange(currentPage - 1)}
-                >
-                  Previous
-                </Button>
-                
-                <div className="flex items-center gap-1">
-                  {[...Array(Math.min(5, pagination.pages))].map((_, i) => {
-                    const page = i + 1
-                    const isCurrentPage = page === currentPage
-                    
-                    return (
-                      <Button
-                        key={page}
-                        variant={isCurrentPage ? "default" : "outline"}
-                        size="sm"
-                        className="w-8 h-8 p-0"
-                        onClick={() => handlePageChange(page)}
-                        disabled={loading}
-                      >
-                        {page}
-                      </Button>
-                    )
-                  })}
-                  
-                  {pagination.pages > 5 && currentPage < pagination.pages - 2 && (
-                    <>
-                      <span className="px-1">...</span>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-8 h-8 p-0"
-                        onClick={() => handlePageChange(pagination.pages)}
-                        disabled={loading}
-                      >
-                        {pagination.pages}
-                      </Button>
-                    </>
-                  )}
+            {pagination && pagination.pages > 1 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 flex-shrink-0">
+                <div className="text-sm text-gray-600 text-center sm:text-left">
+                  <span className="hidden sm:inline">
+                    Showing <span className="font-medium">{(currentPage - 1) * pagination.limit + 1}</span> to{' '}
+                    <span className="font-medium">
+                      {Math.min(currentPage * pagination.limit, pagination.total)}
+                    </span> of{' '}
+                  </span>
+                  <span className="font-medium">{pagination.total}</span> posts
                 </div>
                 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={currentPage === pagination.pages || loading}
-                  onClick={() => handlePageChange(currentPage + 1)}
-                >
-                  Next
-                </Button>
+                <div className="flex items-center space-x-1 sm:space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage === 1 || loading}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    className="px-2 sm:px-3"
+                  >
+                    <span className="hidden sm:inline">Previous</span>
+                    <span className="sm:hidden">Prev</span>
+                  </Button>
+                  
+                  <div className="flex items-center gap-1">
+                    {[...Array(Math.min(3, pagination.pages))].map((_, i) => {
+                      const page = i + 1
+                      const isCurrentPage = page === currentPage
+                      
+                      return (
+                        <Button
+                          key={page}
+                          variant={isCurrentPage ? "default" : "outline"}
+                          size="sm"
+                          className="w-8 h-8 p-0"
+                          onClick={() => handlePageChange(page)}
+                          disabled={loading}
+                        >
+                          {page}
+                        </Button>
+                      )
+                    })}
+                    
+                    {pagination.pages > 3 && currentPage < pagination.pages - 1 && (
+                      <>
+                        <span className="px-1 text-gray-400">...</span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-8 h-8 p-0"
+                          onClick={() => handlePageChange(pagination.pages)}
+                          disabled={loading}
+                        >
+                          {pagination.pages}
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage === pagination.pages || loading}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    className="px-2 sm:px-3"
+                  >
+                    <span className="hidden sm:inline">Next</span>
+                    <span className="sm:hidden">Next</span>
+                  </Button>
+                </div>
               </div>
-            </div>
-          )}
-        </>
-      )}
+            )}
+          </>
+        )}
+      </div>
     </div>
   )
 }
