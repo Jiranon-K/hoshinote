@@ -11,6 +11,7 @@ import BulletList from '@tiptap/extension-bullet-list'
 import OrderedList from '@tiptap/extension-ordered-list'
 import ListItem from '@tiptap/extension-list-item'
 import Youtube from '@tiptap/extension-youtube'
+import { useState, useEffect } from 'react'
 
 interface TipTapRendererProps {
   content: string
@@ -18,6 +19,12 @@ interface TipTapRendererProps {
 }
 
 export default function TipTapRenderer({ content, className = '' }: TipTapRendererProps) {
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -64,13 +71,12 @@ export default function TipTapRenderer({ content, className = '' }: TipTapRender
     ],
     content: content || '<p>No content available.</p>',
     editable: false,
-    immediatelyRender: false,
     editorProps: {
       attributes: {
         class: `prose prose-lg prose-slate max-w-none focus:outline-none ${className}`,
       },
     },
-  })
+  }, [isClient])
 
   if (!content) {
     return (
@@ -80,14 +86,18 @@ export default function TipTapRenderer({ content, className = '' }: TipTapRender
     )
   }
 
+  if (!isClient) {
+    return (
+      <div className={`prose prose-lg prose-slate max-w-none ${className}`}>
+        <div dangerouslySetInnerHTML={{ __html: content || '<p>No content available.</p>' }} />
+      </div>
+    )
+  }
+
   if (!editor) {
     return (
-      <div className={`${className}`}>
-        <div className="animate-pulse space-y-4">
-          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-          <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-        </div>
+      <div className={`prose prose-lg prose-slate max-w-none ${className}`}>
+        <div dangerouslySetInnerHTML={{ __html: content || '<p>No content available.</p>' }} />
       </div>
     )
   }
