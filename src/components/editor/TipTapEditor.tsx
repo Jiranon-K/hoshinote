@@ -94,6 +94,8 @@ export default function TipTapEditor({
         bulletList: false,
         orderedList: false,
         listItem: false,
+        link: false,
+        underline: false,
       }),
       BulletList.configure({
         HTMLAttributes: {
