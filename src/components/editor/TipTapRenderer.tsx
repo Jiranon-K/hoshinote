@@ -31,6 +31,8 @@ export default function TipTapRenderer({ content, className = '' }: TipTapRender
         bulletList: false,
         orderedList: false,
         listItem: false,
+        link: false,
+        underline: false,
       }),
       BulletList.configure({
         HTMLAttributes: {
